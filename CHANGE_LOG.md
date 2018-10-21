@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0504: 5.3 (NathanKell) for KSP 0.23.5
+	+ Fix DLL
+	+ Upgrade Kethane converter config to eadrom's.
+	+ Fix ModuleRCSFX compatibility to be non-destructive
+	+ Fix fixed launch clamp pumps (taniwha)
+	+ Upgrade to ModuleManager v2.1.0
 * 2014-0429: 5.2 (NathanKell) for KSP 0.23.5
 	+ Changelog:
 		- Add support for Nazari's Mk3 expansion, add ECLSS fix, fix ARM patches.
