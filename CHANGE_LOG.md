@@ -1,5 +1,10 @@
 # Modular Fuel Systems :: Change Log
 
+* 2018-0403: 12.5.0 (blowfishpro) for KSP 1.3.1
+	+ Fix vesion checker which reported KSP 1.3.1 as incompatible
+	+ Implement new entry cost system for RP-0/1
+	+ Disable thrust limiter when no throttling
+	+ Implement min and max utilization support on tanks
 * 2017-1025: 12.4.1 (blowfishpro) for KSP 1.3.1
 	+ Don't double heat flux (workaround which is no longer necessary in KSP 1.3.1)
 	+ Actually update .version file
