@@ -1,5 +1,8 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-1024: 12.4.0 (blowfishpro) for KSP 1.3.1
+	+ Recompile for KSP 1.3.1
+	+ Fix MM configs with more than one pass in kethane tanks config
 * 2017-0817: 12.3.1 (blowfishpro) for KSP 1.3
 	+ Actually fix the bug with tanks not getting their contents correctly (not fixed in v12.3.0)
 * 2017-0813: 12.3.0 (blowfishpro) for KSP 1.3
