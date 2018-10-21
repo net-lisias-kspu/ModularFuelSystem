@@ -1,5 +1,14 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0408: 5.1 (NathanKell) for KSP 0.23.5
+	+ Fixed RCS Sounds compatibility
+	+ Fixed g0 constant in all RF-compatible engines to be the real 9.80665m/s rather than KSP's 9.82m/s (even though elsewhere they use 9.81, for engines they use 9.82).
+	+ Fixed semi-automatic ModuleEnginesFX support to actually work.
+	+ Preliminary tweakables support from swamp_ig
+	+ Support new ARM tanks (taniwha)
+	+ Support TurboNiso tanks (Spanier)
+	+ Recompiled for .23.5
+	+ Changed DLL name. YOU MUST DELETE OLD RF FOLDER BEFORE INSTALLING v5.1!
 * 2013-0613: 1.3 (ialdabaoth) for KSP 0.20
 	+ fixed a bug where Isp wouldn't set properly when choosing engine configurations
 	+ changed TANK_DEFINITION format for proportional tanks from 'maxAmount = number * volume' to 'maxAmount = number%'
