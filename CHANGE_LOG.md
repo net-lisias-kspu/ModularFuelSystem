@@ -1,5 +1,21 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0605: 6.0 (NathanKell) for KSP 0.23.5
+	+ Changelog:
+		- Updated plane parts (C7, Firespitter) to have B9-esque levels of resources. No more magic volume-disapppearing tricks when fuel tanks become fuselages.
+		- Massive improvements from swamp_ig, for integration with Procedural Parts and other mods, and UI improvements.
+		- Switchable tanks
+		- fixed symmetry bug
+		- (optional) tweakable utilization
+		- Better integration support
+		- loading fixes
+		- Display GUI from tweakables
+		- SI units
+		- taniwha: show version on GUI
+		- support more Firespitter parts
+		- Update to ModuleManager v2.1.5
+		- Sandworm: support HGR tanks
+		- NOTE_: At this point it is recommended to switch from StretchyTanks to Procedural Parts (if you have not already done so).
 * 2014-0504: 5.3 (NathanKell) for KSP 0.23.5
 	+ Fix DLL
 	+ Upgrade Kethane converter config to eadrom's.
