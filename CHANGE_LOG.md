@@ -1,5 +1,13 @@
 # Modular Fuel Systems :: Change Log
 
+* 2018-0520: 12.6.0 (blowfishpro) for KSP 1.3.1
+	+ Add multi-layer insulation and dewar (vacuum) bottles
+		- MLI is configured by `numberOfMLILayers` on the `TANK_DEFINITION`
+			- Each layer adds cost and mass
+			- Cryo and balloon cryo tank types now come with 10 layers of MLI
+		- Dewar / vacuum bottles defind by `isDewar = true` on the `TANK`
+			- Cryogenic fuels in the Serivce Module tank type use this
+			- Does not work with other types of insulation
 * 2018-0403: 12.5.0 (blowfishpro) for KSP 1.3.1
 	+ Fix vesion checker which reported KSP 1.3.1 as incompatible
 	+ Implement new entry cost system for RP-0/1
