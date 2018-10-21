@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0121: 12.0.1 (blowfishpro) for KSP 1.2.2
+	+ Fix TestFlight integration
+	+ Fix engine configs in career that aren't unlocked by upgrade nodes
+	+ Fix harmless but noisy error message when using thrust curves
 * 2016-1221: 12.0.0 (blowfishpro) for KSP 1.2.2
 	+ Update to KSP 1.2.2
 	+ Update to SolverEngines v3.0
