@@ -1,5 +1,10 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0703: 6.4 (NathanKell) for KSP 0.23.5
+	+ Changelog:
+		- Allow fuselages to hold life support resources
+		- Allow CONFIGs to have techRequired items (can limit available Engine Configs based on R&D nodes researched)
+		- Fix service modules to not start full when TACLS/ECLSS is installed
 * 2014-0702: 6.3 (NathanKell) for KSP 0.23.5
 	+ Changelog:
 		- Add Roxette's Spaceplane Plus support
