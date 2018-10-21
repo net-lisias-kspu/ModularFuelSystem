@@ -1,5 +1,12 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0606: 10.1 (NathanKell) for KSP 1.0
+	+ Changelog:
+		- Added specific heats for most of the resources (thanks stratochief!).
+		- Revised temperature gauge for rocket engines.
+		- Set tanks with cryo propellants to their boiling points during prelaunch when pumps (i.e. launch clamps) are connected, so they don't start way above BP.
+		- Make life support waste resources not fillable.
+		- Compatibility with Ven's Stock Revamp for the RF cloned parts
 * 2015-0525: 10.0 (NathanKell) for KSP 1.0
 	+ Changelog:
 		- SAVE-BREAKING.
