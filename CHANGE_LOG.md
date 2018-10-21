@@ -1,5 +1,21 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-1124: 8.2pre (NathanKell) for KSP 0.24.2 PRE-RELEASE
+	+ Update heat pumps (thanks Starwaster)
+	+ Fix added parts to be MM clones
+	+ taniwha: lots of refactoring
+	+ regex: add lots of missing tanks (FASA, HGR, NP2, RLA, SXT)
+	+ dreadicon: improved KSPI config
+	+ camlost: RetroFuture tank configs
+	+ TriggerAu: include icons for ARP in RealFuels rather than in ARP
+	+ taniwha: correct tank cost calcs
+	+ Raptor831: Add missing NP2, HGR tanks; Add Taurus pod/SM tanks
+	+ lilienthal: fix Thermal Fin description
+	+ Starman-4308: Add configs for Modular Rocket System
+	+ Add support for the 0.625m tanks in Ven's Stock Part Revamp
+	+ Show tank/fuel cost in GUI
+	+ Lower Solid Fuel and ElectricCharge costs (oops)
+	+ Fix so science sandbox is still detected as "has R&D tree"
 * 2014-1018: 8.1 (NathanKell) for KSP 0.24.2
 	+ Fix my stupidity; I forgot to change some of RF's own patches to account for the new resource names.
 	+ camlost: fix tank name for new FS.
