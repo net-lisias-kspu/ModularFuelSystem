@@ -1,5 +1,10 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0704: 10.4.3 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Fix an NRE in ullage code in editor.
+		- Fix a bug with multFlow not being used correctly.
+	+ (EDIT: Archive fixed, thanks @Gerry1135 )
 * 2015-0703: 10.4.2 (NathanKell) for KSP 1.0.4.
 	+ Recompile/repack with correct KSPAPIExtensions
 * 2015-0626: 10.4.1 (NathanKell) for KSP 1.0.4.
