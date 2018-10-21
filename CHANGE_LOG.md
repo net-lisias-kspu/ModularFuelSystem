@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0706: 10.4.4 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Fix bug where tanks that had flow disabled in partactionmenu were not counted for pressure-fed checks.
+		- Fix bug where legacy EI configs were not being applied.
+		- Fix issues with fuel ratio for ullage.
+		- Show ignitions and pressure-fed-ness in Editor tooltips.
 * 2015-0704: 10.4.3 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Fix an NRE in ullage code in editor.
