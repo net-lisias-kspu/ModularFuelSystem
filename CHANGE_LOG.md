@@ -1,5 +1,10 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0721: 10.4.9 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Hotfix for the hotfix.
+		- Don't load/save ullage sim data in editor.
+		- NOTE: You may have to detach and reattach your engines in saved craft. Also, action groups involving engines will need to be remade.
 * 2015-0720: 10.4.8 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Hotfix for duplicated actions on engines (requires SolverEngines 1.7).
