@@ -1,5 +1,15 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0615: 10.3 (NathanKell) for KSP 1.0
+	+ Changelog:
+		- Added cost to unlock new configurations and new TLs for engines. Cost can be fully configured both globally and per part config, and can take from funds and/or science. See UPGRADE COSTS below.
+		- Add hsp for Furfurfyl Alcohol.
+		- Make the GUI draggable in action editor too.
+		- Update for latest SolverEngines.
+		- Clamp chamber temp to be no lower than part internal temp.
+		- Allow random variation in fuel flow (defaults to 0 variation, set varyThrust to a >0 number to enable). Thrust variation is multiplicative, and will be in the range +/- (global varyThrust \* ModuleEnginesRF.varyThrust). ModuleEnginesRF.varyThrust defaults to 1.0. Example: you set global varyThrust (in RFSETTINGS) to 0.008. Then all engines that use ModuleEnginesRF will have +/- 0.8% variation in their thrust during flight.
+		- Fix a bug in detecting engines to autoconfigure for: let's check ourselves too.
+		- Fix issues in basemass / basecost overrides in ModuleFuelTank nodes.
 * 2015-0610: 10.2 (NathanKell) for KSP 1.0
 	+ Changelog:
 		- Allow time-based thrust curves.
