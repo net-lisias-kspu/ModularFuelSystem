@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2018-0523: 12.7.1 (blowfishpro) for KSP 1.4.3
+	+ Fix exceptions when initializing ModuleEnginesRF
+	+ Fix mass display in the part action window not accounting for MLI
+	+ Remove a bit of log spam
 * 2018-0520: 12.7.0 (blowfishpro) for KSP 1.4.3
 	+ Recompile for KSP 1.4.3
 * 2018-0520: 12.6.0 (blowfishpro) for KSP 1.3.1
