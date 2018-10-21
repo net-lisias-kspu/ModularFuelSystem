@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0626: 10.4.1 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Fix throttle/ignition for throttle-locked (solids).
+		- Fix to report nominal propellant status when pressurefed OK and ullage disabled.
 * 2015-0625: 10.4 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Update for KSP 1.0.4.
