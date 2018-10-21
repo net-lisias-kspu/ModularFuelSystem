@@ -1,5 +1,19 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-1001: 7.4 (NathanKell) for KSP 0.24.2
+	+ Changelog:
+		- B9 configs removed from RF; they are included in B9 itself.
+		- Fixed so tank-switching can be done after a database reload
+		- Added procedural cost, with taniwha
+		- Fixed refueling pumps again, with taniwha (they respect flow and flow type, and cost funds)
+		- Autoconfig buttons moved to the top of the list, and fixed (will now treat jets etc properly, and both multimode modes)
+		- Supports multiple ModuleEngineConfigs per part (i.e. Multi mode engines, engine+RCS, etc)
+		- Maeyanie: add support for SXT and KAX
+		- Removed some unneeded Firespitter entries
+		- Supports Tweakscale again, internally. NOTE if you do not have tweakscale, you will get a harmless exception in the log about failing to load Tweakscale_Realfuels.dll. Ignore it.
+		- Made all RCS tanks into ServiceModule tanks (finally); deprecated old RCS tank type.
+		- Aristurtle Support blackheart's AJKD and KSLO mods.
+		- Raptor831: Support for Kommit Nucleonics, KSPI improvement, Near Future
 * 2014-0815: 7.3 (NathanKell) for KSP 0.24.2
 	+ Changelog:
 		- Change versioning to 0.x.y internally.
