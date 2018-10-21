@@ -1,5 +1,16 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0424: 12.1.0 (blowfishpro) for KSP 1.2.2
+	+ Reinstate analytic boiloff with improvements
+	+ Set specific heat to zero for cryogenic resources (assumption that part and resource temperature are the same doesn't make sense here)
+	+ Disable ferociousBoilOff since changing cryogenic resource specific heat makes it unnecessary
+	+ Add the ability for ignitions to be allowed only when attached to launch clamps
+	+ Make sure cost only gets multiplied by scale once
+	+ Fix issue where engines would explode after being decoupled (due to KSP reporting the wrong ambient temperature for a couple of frames)
+	+ Fix resource mix buttons not showing up when a ship is first loaded
+	+ Fix fuel tank related NRE in flight
+	+ Make burn time formatting consistent
+	+ Fix vacuum thrust displaying the same as sea level thrust
 * 2017-0121: 12.0.1 (blowfishpro) for KSP 1.2.2
 	+ Fix TestFlight integration
 	+ Fix engine configs in career that aren't unlocked by upgrade nodes
