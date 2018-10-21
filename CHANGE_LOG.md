@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-0704: 11.3.0 (NathanKell) for KSP 1.1.3
+	+ Changelog:
+		- Tweak to boiloff and to how conduction is compensated.
+		- Slight optimization in the ullage VesselModule.
+		- Attempting to add back tweakscale support for ModuleEngineConfigs.
+		- Update to KSP 1.1.3.
 * 2016-0515: 11.2.0 (NathanKell) for KSP 1.1.2
 	+ Correct a bug in tank basemass calculation such that parts sometimes mass less than they should in flight. Thanks soundnfury for finding this!
 	+ New UI skin thanks to Agathorn!
