@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-1018: 8.1pre (jbengtson) for KSP 0.24.2 PRE-RELEASE
+	+ Interim release to handle the incorrect fuel names per NathanKell's last commit.
 * 2014-1013: 8.0 (NathanKell) for KSP 0.24.2
 	+ Changelog:
 		- SAVE-BRREAKING - however, regex made a tool to attempt to update saves. Post on the thread if you want to try it out.
