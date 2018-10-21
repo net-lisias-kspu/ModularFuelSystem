@@ -1,5 +1,8 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-1025: 12.4.1 (blowfishpro) for KSP 1.3.1
+	+ Don't double heat flux (workaround which is no longer necessary in KSP 1.3.1)
+	+ Actually update .version file
 * 2017-1024: 12.4.0 (blowfishpro) for KSP 1.3.1
 	+ Recompile for KSP 1.3.1
 	+ Fix MM configs with more than one pass in kethane tanks config
