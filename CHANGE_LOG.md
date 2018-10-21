@@ -1,5 +1,18 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0725: 7.0 (NathanKell) for KSP 0.24.1
+	+ Add tanks to more FS parts
+	+ Disable TweakScale on any part with a ModuleEngineConfigs / ModuleHybridEngine_
+	+ TACLS now supports RF/MFT natively, so removed TACLS interaction cfg.
+	+ Enable ElectricCharge in fuselages
+	+ Update ElectricCharge utilization to be 500 rather than 100 (mass per EC unchanged). Now it quite closely matches Silver Zinc Oxide batteries in volume as well as mass.
+	+ Spanier: add KSPX Short 2.5m RCS config.
+	+ Revert to showing the full precision volume of tanks.
+	+ Removed configs for B9 jets and rockets; use AJE.
+	+ Removed last remaining engine configs (Starwaster's NTRs, TT Vector engine)--use an engine pack!
+	+ By default bring back up the mass of solid fuel in a part to where it was pre-RF. Later configs will override.
+	+ Temporarily disable the "dedicated" setting for tanks, it's just causing issues.
+	+ Update to 0.24.1
 * 2014-0703: 6.4 (NathanKell) for KSP 0.23.5
 	+ Changelog:
 		- Allow fuselages to hold life support resources
