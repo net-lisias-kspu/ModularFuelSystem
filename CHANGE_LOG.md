@@ -1,5 +1,8 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-1221: 12.0.0 (blowfishpro) for KSP 1.2.2
+	+ Update to KSP 1.2.2
+	+ Update to SolverEngines v3.0
 * 2016-0708: 11.3.1 (NathanKell) for KSP 1.1.3
 	+ Fix an issue with verniers and TestFlight.
 * 2016-0704: 11.3.0 (NathanKell) for KSP 1.1.3
