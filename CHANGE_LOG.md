@@ -1,5 +1,12 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0424: 9.1 (NathanKell) for KSP 0.90
+	+ Changelog:
+		- Fixed stock RCS and xenon tank volumes.
+		- Don't pump into tanks if their flow has been turned off.
+		- Clamp utilization slider to 1% (avoids a divide-by-zero).
+		- Fix typos in Tantares tanks. Thanks komodo!
+		- Unlock input when the RF GUI disappears (fixes a bug where clicking can be locked).
 * 2015-0404: 9.0 (NathanKell) for KSP 0.90
 	+ Changelog:
 		- Added notes on tank types to the notes section at the bottom of the readme.
