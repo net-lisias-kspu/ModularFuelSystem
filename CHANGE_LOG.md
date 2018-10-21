@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0731: 12.2.2 (blowfishpro) for KSP 1.2.2
+	+ Fix bug in how tank surface area is calculated
+	+ Fix tank copying when cloning via symmetry
+	+ Don't delete tanks during loading or part placement
+	+ Fix patches marked :FINAL
+	+ Disable part heating due to engine on RF engines, since engine overheat is handled separately and engine heat shouldn't spill to other parts
 * 2017-0708: 12.2.1 (blowfishpro) for KSP 1.2.2
 	+ Fix tank's initial temperature not being set correctly on vessel spawn and when launch clamps are attached
 	+ Remove some logspam for boiloff in analytic mode (high timewarp)
