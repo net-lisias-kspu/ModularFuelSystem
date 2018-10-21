@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0625: 10.4 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Update for KSP 1.0.4.
+		- Ullage and limited ignitions now included, works like EngineIgnitor though the module configuration is different. If you set EI configs in your ModuleEngineConfigs CONFIG nodes, however, those will be read just fine by RF.
+		- Spaceplane part volumes and tank types tweaked for better utility.
+		- TweakScale support for engines.
 * 2015-0616: 10.3.1 (NathanKell) for KSP 1.0
 	+ Changelog:
 		- Readme update,
