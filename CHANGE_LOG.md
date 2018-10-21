@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0708: 12.2.1 (blowfishpro) for KSP 1.2.2
+	+ Fix tank's initial temperature not being set correctly on vessel spawn and when launch clamps are attached
+	+ Remove some logspam for boiloff in analytic mode (high timewarp)
+	+ Make sure tank's lowest temperature is calculated correctly and that part temp is only set if cryogenic resources are present
+	+ Fix negative temperature caused by conduction compensation in analytic mode (high timewarp)
+	+ Fix sign error on flux in analytic mode (high timewarp)
 * 2017-0707: 12.2.0 (blowfishpro) for KSP 1.2.2
 	+ Fix for engines not properly loading pressure fed setting from
 	+ ModuleEngineConfig
