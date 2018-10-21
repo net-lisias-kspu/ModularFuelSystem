@@ -1,5 +1,25 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0525: 10.0 (NathanKell) for KSP 1.0
+	+ Changelog:
+		- SAVE-BREAKING.
+		- KSP 1.0 support.
+		- Remove thermal fin and radiator.
+		- Use Community Resource Pack for our resources, don't add resources in RF.
+		- Xenon tank type is removed; all of these tanks use ElectricPropulsion now.
+		- Now have multiple different solid fuel resources, and thus multiple different solid fuel tank types.
+		- Add module info in the editor tooltip for tanks
+		- Engine info / configuration info will only display for the master ModuleEngineConfigs on the part.
+		- Disable MEC event firing on configuration change (was killing FAR).
+		- Updating an engine config will properly propagate to symmetry counterparts.
+		- Updating the engine config of an isMaster=true module can propagate changes to isMaster=false modules on the same part (and will propagate properly across symmetry counterparts). Example: Change the main engine config and the vernier config will auto-update. Done by, for each CONFIG, adding an OtherModules {} node. Inside are key-value pairs, where key = engineID of other module and value is config to switch to.
+		- Separate settings for RF engines (RFSETTINGS) and tanks (still MFSSETTINGS).
+		- Remove deprecated old version of hybrid engines (the one that is essentially MultiModeEngine).
+		- Speed up ModuleEngineConfigs a lot, cut the excess bits from ModuleHybridEngines.
+		- Fix issue with heat multiplier
+		- Rewrite floatcurve-modder to respect tangents.
+		- Massively refactor engines code. RealFuels, like AJE, will use an engine solver now. The new engine module (ModuleEnginesRF) handles thrust curves, throttle speed, emission and internal engine temperature, automatically extending Isp curves to 0 Isp, etc.
+		- MEC (and MHE) default to using weak typing: type = ModuleEngines means apply to ModuleEngines or anything derived from it (same for ModuleRCS etc). You can disable this feature per-module if needed.
 * 2015-0424: 9.1 (NathanKell) for KSP 0.90
 	+ Changelog:
 		- Fixed stock RCS and xenon tank volumes.
