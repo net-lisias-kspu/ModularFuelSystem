@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-0312: 10.8.5 (NathanKell) for KSP 1.0.5
+	+ Don't try to stop other-config FX every frame, do more null checking (should speed things up a abit and avoid NREs).
+	+ Allow setting (in MFSSettings) the multiplier to lowest boiling point to use for radiator calls.
+	+ Rework engine throttle response speed, make it tunable in RealSettings and in per-engine cfg.
 * 2016-0228: 10.8.4 (NathanKell) for KSP 1.0.5
 	+ Update propellant status info line during warp as well.
 	+ Change background color of engine stack icon based on propellant stability (like parachutes).
