@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-1220: 8.3 (NathanKell) for KSP 0.90
+	+ Changelog:
+		- Update to .90 (thanks ckfinite and taniwha)
+		- Don't fire editor events when we shouldn't
+		- Add cost info to engine change GUI
+		- Show engine configs that are not available due to tech (not having that node)
 * 2014-1211: 8.2 (NathanKell) for KSP 0.24.2
 	+ Changelog:
 		- Update heat pumps (thanks Starwaster)
