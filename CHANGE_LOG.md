@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-1119: 10.8.1 (NathanKell) for KSP 1.0.5
+	+ Changelog
+		- Update to SolverEngines v1.13.
+		- Fix emissives patch for 1.0.5.
+		- Add some patch magic to the emissives patch to fix VenStockRevamp engine emissives.
+		- Add LOX insulation to tank type Cryogenic.
 * 2015-1119: 10.8 (NathanKell) for KSP 1.0.5
 	+ Update for KSP 1.0.5, start to tune boiloff for new thermo.
 	+ Add tooltips when hovering over (locked or unlocked) engine configs in the engine GUI.
