@@ -1,5 +1,8 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0813: 12.3.0 (blowfishpro) for KSP 1.3
+	+ Fix bug with tanks not loading their contents correctly
+	+ Add .version file
 * 2017-0813: 12.2.4 (blowfishpro) for KSP 1.2.2
 	+ Fix bug with tanks not loading their contents correctly
 	+ Add .version file
