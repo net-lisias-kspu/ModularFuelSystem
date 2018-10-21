@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0607: 6.1 (Swamp-Ig) for KSP 0.23.5
+	+ I've fixed a couple of bugs, and NK is away, so I thought I'd do an interim release.
+	+ Fixed:
+		- Issue with SRBs not working
+		- 18 Phantom tanks
+		- Trimmed down the amount of guff being saved to the persistence files
 * 2014-0605: 6.0 (NathanKell) for KSP 0.23.5
 	+ Changelog:
 		- Updated plane parts (C7, Firespitter) to have B9-esque levels of resources. No more magic volume-disapppearing tricks when fuel tanks become fuselages.
