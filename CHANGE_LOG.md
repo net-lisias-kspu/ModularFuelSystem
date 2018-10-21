@@ -1,5 +1,19 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0610: 10.2 (NathanKell) for KSP 1.0
+	+ Changelog:
+		- Allow time-based thrust curves.
+		- Fix thrust curves to actually work.
+		- Add more specific heat capacities for resources.
+		- Fix NaN with SolverEngines.
+		- basemass now defaults for being for the entire part, not just the utilized portion (i.e. utilization slider is ignored for basemass, always 100%). This will marginally increase tank masses. This can be toggled in MFSSettings.cfg.
+		- Update volume and type of some spaceplane adapter tanks.
+		- (Finally!) add nacelleBody and radialEngineBody.
+		- Fix typo with large Xenon tank; properly patched now.
+		- Support any case for 'Full' when setting amount in a TANK.
+		- Fix when engine configs could sometimes be empty.
+		- Fix up boiloff loss rates for KSP 1.0 heating.
+		- Add some heat loss when propellant boils off (due to vaporization heat).
 * 2015-0606: 10.1 (NathanKell) for KSP 1.0
 	+ Changelog:
 		- Added specific heats for most of the resources (thanks stratochief!).
