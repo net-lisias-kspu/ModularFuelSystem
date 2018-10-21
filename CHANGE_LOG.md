@@ -1,5 +1,10 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-1110: 10.7.2 (Starwaster) for KSP 1.0.
+	+ Increased boiloff rate can be switched off by adding ferociousBoilOff = False to MFSSETTINGS (best use MM patch for that)
+	+ PhysicsGlobal.conductionFactor can be compensated for by adding globalConductionCompensation = true to MFSSETTINGS (use at own risk)
+	+ cryogenic outerInsulation improved to 0.0005 (previous value 0.01)
+	+ All LOX tanks now assume stainless steel tanks, except the ServiceModule.
 * 2015-1107: 10.7.1 (Starwaster) for KSP 1.0.
 	+ Fixed bug where individual tank insulation/tank values weren't loading
 	+ in.
