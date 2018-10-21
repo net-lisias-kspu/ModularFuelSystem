@@ -1,5 +1,13 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0429: 5.2 (NathanKell) for KSP 0.23.5
+	+ Changelog:
+		- Add support for Nazari's Mk3 expansion, add ECLSS fix, fix ARM patches.
+		- Fix launch clamps so they pump to all parts.
+		- ialdabaoth: add support for RF adjustments via tweakables.
+		- Fix RCS tank basemass
+		- Support ModuleRCSFX
+		- Fix some engine patches to play nicer with HotRockets
 * 2014-0408: 5.1 (NathanKell) for KSP 0.23.5
 	+ Fixed RCS Sounds compatibility
 	+ Fixed g0 constant in all RF-compatible engines to be the real 9.80665m/s rather than KSP's 9.82m/s (even though elsewhere they use 9.81, for engines they use 9.82).
