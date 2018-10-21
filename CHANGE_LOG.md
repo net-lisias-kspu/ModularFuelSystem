@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-0201: 10.8.3 (NathanKell) for KSP 1.0.5
+	+ Changelog:
+		- Fix engine thrust display formatting in tooltips.
+		- Add a bit of insulation to tank type Default (it represents S-IVB-level insulation).
+		- Show cost display again in the tank GUI.
+		- Update for SolverEngines 1.15.
 * 2016-0123: 10.8.2 (NathanKell) for KSP 1.0.5
 	+ Changelog:
 		- Fix log spam.
