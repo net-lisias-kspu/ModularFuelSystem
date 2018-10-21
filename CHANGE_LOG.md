@@ -1,5 +1,15 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0803: 7.2 (NathanKell) for KSP 0.24.2
+	+ Changelog
+		- Fix bug with auto-rescaling of solid fuel resources.
+		- aristurtle: add support for 5m KW tanks
+		- Add back ModuleRCSFX support (get ModuleRCSFX from Realism Overhaul)
+		- Fix the exposed Isp multipliers (for interoperability)
+		- Add more failsafe checks and ways to avoid issues in Win x64
+		- Add support for thrustCurve in CONFIG (x = ratio of currentFuel/maxFuel, y = multiplier to thrust)
+		- Allow local overriding of the visbility of the Volume Utilization slider
+		- Update to KSPAPIExtensions 1.7.0
 * 2014-0725: 7.1 (NathanKell) for KSP 0.24.2
 	+ Update to KSP 0.24.2
 * 2014-0725: 7.0 (NathanKell) for KSP 0.24.1
