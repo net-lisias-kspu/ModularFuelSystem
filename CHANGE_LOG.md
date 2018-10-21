@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-0508: 11.1.1 (NathanKell) for KSP 1.1.2
+	+ Fix an NRE that was messing up staging in the VAB/SPH
 * 2016-0507: 11.1.0 (NathanKell) for KSP 1.1.2
 	+ Enable conduction compensation (now that FAR no longer lowers conduction).
 	+ Set resources to volume=1 for compatibility with other mods.
