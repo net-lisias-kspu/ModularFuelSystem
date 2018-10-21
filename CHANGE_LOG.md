@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0713: 10.4.6 (NathanKell) for KSP 1.0.4.
+	+ Hotfix for PP Proc SRB issue.
 * 2015-0710: 10.4.5 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Update to CRP 4.3. Remove no-longer-needed hsp changes.
