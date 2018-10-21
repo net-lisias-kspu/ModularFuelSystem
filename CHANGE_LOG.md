@@ -1,5 +1,16 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0815: 7.3 (NathanKell) for KSP 0.24.2
+	+ Changelog:
+		- Change versioning to 0.x.y internally.
+		- Only apply SF patch to parts with SolidFuel (less log spam)
+		- Fixed KIDS interoperabilty
+		- Fixed so that throttle and massMult work for CONFIGs that don't use techlevels.
+		- thrustCurves now modify heat in proportion to thrust
+		- Launch clamp refuel pumps default to off (note: the value is persistent, so if you have a saved craft from before this change, and it has clamps, they will still be defaulting to on).
+		- aristurtle: fix bugs in HGR config, fix KW typos, add more KW tanks, add KSO tanks
+		- Increase B9 spaceplane parts fuel capacity by 1.5x to bring them more in line with their physical volume, switch them to using Fuselage tank type
+		- Fix right-click menu displays regarding rated thrust; now there is only one display, and it only shows up when there is a thrustCurve in use.
 * 2014-0803: 7.2 (NathanKell) for KSP 0.24.2
 	+ Changelog
 		- Fix bug with auto-rescaling of solid fuel resources.
