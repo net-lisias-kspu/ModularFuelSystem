@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0731: 12.2.3 (blowfishpro) for KSP 1.3
+	+ Recompile for KSP 1.3
 * 2017-0731: 12.2.2 (blowfishpro) for KSP 1.2.2
 	+ Fix bug in how tank surface area is calculated
 	+ Fix tank copying when cloning via symmetry
