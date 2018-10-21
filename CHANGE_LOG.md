@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0703: 10.4.2 (NathanKell) for KSP 1.0.4.
+	+ Recompile/repack with correct KSPAPIExtensions
 * 2015-0626: 10.4.1 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Fix throttle/ignition for throttle-locked (solids).
