@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2018-0520: 12.7.0 (blowfishpro) for KSP 1.4.3
+	+ Recompile for KSP 1.4.3
 * 2018-0520: 12.6.0 (blowfishpro) for KSP 1.3.1
 	+ Add multi-layer insulation and dewar (vacuum) bottles
 		- MLI is configured by `numberOfMLILayers` on the `TANK_DEFINITION`
