@@ -1,5 +1,12 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-1018: 8.1 (NathanKell) for KSP 0.24.2
+	+ Fix my stupidity; I forgot to change some of RF's own patches to account for the new resource names.
+	+ camlost: fix tank name for new FS.
+	+ Fix applying changes to resource amounts more than once on TweakScale rescale.
+	+ Change FS fuselages to calculate their own basemass.
+	+ Fix a GUI click-locking issue.
+	+ Remove old/broken KSPI interaction config; a new one is in the works by dreadicon and Northstar1989.
 * 2014-1018: 8.1pre (jbengtson) for KSP 0.24.2 PRE-RELEASE
 	+ Interim release to handle the incorrect fuel names per NathanKell's last commit.
 * 2014-1013: 8.0 (NathanKell) for KSP 0.24.2
