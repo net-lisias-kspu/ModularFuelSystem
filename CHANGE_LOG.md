@@ -1,5 +1,10 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-0123: 10.8.2 (NathanKell) for KSP 1.0.5
+	+ Changelog:
+		- Fix log spam.
+		- Fix a typo in heat anim patch.
+		- Fix bug with stock radiator interaction.
 * 2015-1119: 10.8.1 (NathanKell) for KSP 1.0.5
 	+ Changelog
 		- Update to SolverEngines v1.13.
