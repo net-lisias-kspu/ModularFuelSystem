@@ -1,5 +1,15 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0620: 6.2 (NathanKell) for KSP 0.23.5
+	+ Changelog:
+		- Added new fuels from RedAV8R
+		- Updated HGR patch from Sandworm
+		- Tweaked some Firespitter part volumes, added support for more fuselage parts
+		- swamp_ig:
+		- Fixed cloning
+		- Fixed default amounts not loading
+		- Fixed ProcParts interoperability issues
+		- Fixed compatibility with Engine Ignitor
 * 2014-0607: 6.1 (Swamp-Ig) for KSP 0.23.5
 	+ I've fixed a couple of bugs, and NK is away, so I thought I'd do an interim release.
 	+ Fixed:
