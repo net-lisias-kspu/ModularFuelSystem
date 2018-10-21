@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-1119: 10.8 (NathanKell) for KSP 1.0.5
+	+ Update for KSP 1.0.5, start to tune boiloff for new thermo.
+	+ Add tooltips when hovering over (locked or unlocked) engine configs in the engine GUI.
+	+ Support descriptions for engine configs (key 'description' in the CONFIG). They are shown on the editor tooltip and in the config tooltip in the engine GUI.
 * 2015-1110: 10.7.2 (Starwaster) for KSP 1.0.
 	+ Increased boiloff rate can be switched off by adding ferociousBoilOff = False to MFSSETTINGS (best use MM patch for that)
 	+ PhysicsGlobal.conductionFactor can be compensated for by adding globalConductionCompensation = true to MFSSETTINGS (use at own risk)
