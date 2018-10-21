@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2016-0228: 10.8.4 (NathanKell) for KSP 1.0.5
+	+ Update propellant status info line during warp as well.
+	+ Change background color of engine stack icon based on propellant stability (like parachutes).
+	+ Add the tech required to unlock a config to the info tooltip for that config (for unavailable configs).
 * 2016-0201: 10.8.3 (NathanKell) for KSP 1.0.5
 	+ Changelog:
 		- Fix engine thrust display formatting in tooltips.
