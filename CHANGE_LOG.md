@@ -1,5 +1,14 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0710: 10.4.5 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Update to CRP 4.3. Remove no-longer-needed hsp changes.
+		- Add a fix to TEATEB flow mode until next CRP.
+		- Clean up behavior when igntions are specified in a CONFIG.
+		- Make the simulateUllage setting be respected.
+		- Add a limitedIgnitions setting (which can be set to false).
+		- Default origTechLevel to -1 to avoid an issue on engine configuration change.
+		- SolverEngines update fixes "can't activate when shielded" issue.
 * 2015-0706: 10.4.4 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Fix bug where tanks that had flow disabled in partactionmenu were not counted for pressure-fed checks.
