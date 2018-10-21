@@ -1,5 +1,16 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0404: 9.0 (NathanKell) for KSP 0.90
+	+ Changelog:
+		- Added notes on tank types to the notes section at the bottom of the readme.
+		- Switch to taniwha's refactor of MFT (should fix a lot of bugs).
+		- Refactor TechLevels, fix longstanding techlevel override bug.
+		- Change so it's not ElectricCharge the resource that costs funds, but rather how much capacity you have.
+		- Fixed bug where an engine that shares FX betwqeen CONFIGs could have its FX shut down.
+		- Removed deprecated StretchyTanks clones.
+		- Add techRequired support for resources and for tank types.
+		- Add gimbal support to modular engines (TechLevel changing or CONFIG changing can change gimbal). Supports only stock gimbal for now.
+		- Cost for engines increases with TechLevel.
 * 2015-0225: 8.4 (NathanKell) for KSP 0.90
 	+ Changelog:
 		- Fixed stock KSP mass calculation (for engineer's report and for pad limits).
