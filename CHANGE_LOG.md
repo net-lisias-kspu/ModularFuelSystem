@@ -1,5 +1,8 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0720: 10.4.8 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Hotfix for duplicated actions on engines (requires SolverEngines 1.7).
 * 2015-0717: 10.4.7 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Tellion: add NF Spacecraft and Construction tank configs.
