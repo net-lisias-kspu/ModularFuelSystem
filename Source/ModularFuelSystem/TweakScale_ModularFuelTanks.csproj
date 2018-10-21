@@ -7,8 +7,9 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{F8D41CCB-BF60-4E9F-946D-6E19D0260175}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>modularFuelTanks</RootNamespace>
-    <AssemblyName>modularFuelTanks</AssemblyName>
+    <BaseIntermediateOutputPath>..\..\obj\ModularFuelTanks</BaseIntermediateOutputPath>
+    <RootNamespace>RealFuers</RootNamespace>
+    <AssemblyName>TweakScale_ModularFuelTanks</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -16,7 +17,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>..</OutputPath>
+    <OutputPath>..\..\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,30 +26,32 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>..</OutputPath>
+    <OutputPath>..\..\bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="TweakScale_ModularFuelSystem.cs" />
+    <Compile Include="tweakscale\TweakScale_ModularFuelSystem.cs">
+      <Link>TweakScale_ModularFuelSystem.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\Games\KSP 0.23 Real Life\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\Games\KSP 0.23 Real Life\KSP_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="Scale_Redist">
-      <HintPath>Scale_Redist.dll</HintPath>
+      <HintPath>..\..\..\..\..\LIB\plugins\Scale_Redist.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="modularFuelTanks.csproj">
-      <Project>{0041813d-dcd1-4ac7-8327-85765bf924a3}</Project>
-      <Name>modularFuelTanks</Name>
+    <ProjectReference Include="ModularFuelTanks.csproj">
+      <Project>{9EA86296-8342-4112-81F3-438C9333E284}</Project>
+      <Name>ModularFuelTanks</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

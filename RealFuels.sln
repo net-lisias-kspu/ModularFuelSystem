@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealFuels", "Source\ModularFuelSystem\RealFuels.csproj", "{0041813D-DCD1-4AC7-8327-85765BF924A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweakScale_RealFuels", "Source\ModularFuelSystem\TweakScale_RealFuels.csproj", "{F2B85F9A-6E39-4525-B31F-A3D764DE28D0}"
+EndProject
+Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "TestFlightRF", "Source\TestFlightRF\TestFlightRF.csproj", "{1B9C0E01-6299-4A51-8E9C-08881F8A0098}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0041813D-DCD1-4AC7-8327-85765BF924A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0041813D-DCD1-4AC7-8327-85765BF924A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0041813D-DCD1-4AC7-8327-85765BF924A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0041813D-DCD1-4AC7-8327-85765BF924A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2B85F9A-6E39-4525-B31F-A3D764DE28D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B85F9A-6E39-4525-B31F-A3D764DE28D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2B85F9A-6E39-4525-B31F-A3D764DE28D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2B85F9A-6E39-4525-B31F-A3D764DE28D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B9C0E01-6299-4A51-8E9C-08881F8A0098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B9C0E01-6299-4A51-8E9C-08881F8A0098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B9C0E01-6299-4A51-8E9C-08881F8A0098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B9C0E01-6299-4A51-8E9C-08881F8A0098}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		version = 10.8.0
+	EndGlobalSection
+EndGlobal

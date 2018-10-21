@@ -1,0 +1,87 @@
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9EA86296-8342-4112-81F3-438C9333E284}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <BaseIntermediateOutputPath>..\..\obj\ModularFuelTanks</BaseIntermediateOutputPath>
+    <RootNamespace>RealFuels</RootNamespace>
+    <AssemblyName>ModularFuelTanks</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>..\..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="MFSSettings.cs" />
+    <Compile Include="assembly\Checkers.cs">
+      <Link>Properties\Checkers.cs</Link>
+    </Compile>
+    <Compile Include="assembly\AssemblyInfoMFT.cs">
+      <Link>Properties\AssemblyInfoMFT.cs</Link>
+    </Compile>
+    <Compile Include="assembly\VersionReport.cs">
+      <Link>Properties\VersionReport.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\FuelInfo.cs">
+      <Link>Tanks\FuelInfo.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\FuelTank.cs">
+      <Link>Tanks\FuelTank.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\FuelTankList.cs">
+      <Link>Tanks\FuelTankList.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\ModuleFuelTanks.cs">
+      <Link>Tanks\ModuleFuelTanks.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\TankDefinition.cs">
+      <Link>Tanks\TankDefinition.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\TankWindow.cs">
+      <Link>Tanks\TankWindow.cs</Link>
+    </Compile>
+    <Compile Include="Tanks\TankDefinitionList.cs">
+      <Link>Tanks\TankDefinitionList.cs</Link>
+    </Compile>
+    <Compile Include="Pumps\RefuelingPump.cs" />
+    <Compile Include="Utilities\Styles.cs" />
+    <Compile Include="EditorToolbar.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent></PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent></PostBuildEvent>
+  </PropertyGroup>
+</Project>
