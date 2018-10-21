@@ -1,5 +1,9 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0909: 10.6.1 (NathanKell) for KSP 1.0.4.
+	+ Changelog:
+		- Fix throttling via `throttle` in CONFIG (minThrust was not being set properly).
+		- Work around an ignition resource issue (due to, apparently, either a float precision issue or a bug in stock KSP code).
 * 2015-0827: 10.6 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- New throttling behavior. Old bugs with it were fixed, and now there is a proper delay while thrust builds up, when igniting a liquid engine. It will take about two seconds for an F-1 class engine to build up to full thrust. The rate can be tweaked, set throttleResponseRate in the ModuleEnginesRF (or in a CONFIG that's applied to one). By default when the current throttle is within 0.5% of the desired throttle, the engine clamps to the desired throttle. Further, when setting 0 throttle, the engine instantly shuts off (the latter will change, later). WORD TO THE WISE: Use launch clamps, and make sure your engines are at full thrust before disengaging the clamps!
