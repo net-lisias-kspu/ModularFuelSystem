@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2014-0725: 7.1 (NathanKell) for KSP 0.24.2
+	+ Update to KSP 0.24.2
 * 2014-0725: 7.0 (NathanKell) for KSP 0.24.1
 	+ Add tanks to more FS parts
 	+ Disable TweakScale on any part with a ModuleEngineConfigs / ModuleHybridEngine_
