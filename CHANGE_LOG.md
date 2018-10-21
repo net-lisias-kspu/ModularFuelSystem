@@ -1,5 +1,7 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-0803: 10.5.1 (NathanKell) for KSP 1.0.4.
+	+ Fix an issue with CONFIG entryCost being lost.
 * 2015-0729: 10.5 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Update to SolverEngines v1.9.
