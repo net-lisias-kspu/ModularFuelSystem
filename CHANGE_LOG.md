@@ -1,5 +1,14 @@
 # Modular Fuel Systems :: Change Log
 
+* 2017-0707: 12.2.0 (blowfishpro) for KSP 1.2.2
+	+ Fix for engines not properly loading pressure fed setting from
+	+ ModuleEngineConfig
+		- Fix for cryogenic tanks exploding during analytic mode after long
+	+ periods unloaded
+		- Avoid possible NRE on fuel pumps when launching with Extraplanetary Launchpads
+		- Fuel pumps must now be present and active in order to avoid boiloff during prelaunch (previously being on the launch pad was enough)
+		- Fuel pumps are now enabled by default and enabled setting respects symmetry in the editor
+		- Streamline fuel pump enable/disable UI - now a simple button rather than display + button
 * 2017-0424: 12.1.0 (blowfishpro) for KSP 1.2.2
 	+ Reinstate analytic boiloff with improvements
 	+ Set specific heat to zero for cryogenic resources (assumption that part and resource temperature are the same doesn't make sense here)
