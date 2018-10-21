@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-1024: 10.7.0 (Starwaster) for KSP 1.0.
+	+ Revamped boiloff code for cryogenic propellants to be compatible with KSP 1.0.x thermodynamics
+	+ (tanks will be properly cooled by evaporation of boiled off resources)
+	+ For now, only LqdOxygen, LqdHydrogen, LqdMethane and LqdAmmonia use the new system. (others may be added if needed)
+	+ Insulation can be either for the whole tank part or per each internal tank.
+	+ Fix issue where TL was not being correctly reset on config change.
 * 2015-0909: 10.6.1 (NathanKell) for KSP 1.0.4.
 	+ Changelog:
 		- Fix throttling via `throttle` in CONFIG (minThrust was not being set properly).
