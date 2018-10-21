@@ -1,5 +1,11 @@
 # Modular Fuel Systems :: Change Log
 
+* 2015-1107: 10.7.1 (Starwaster) for KSP 1.0.
+	+ Fixed bug where individual tank insulation/tank values weren't loading
+	+ in.
+	+ Increased heat leak flux based on  part thermal mass (total) / part
+	+ thermal mass - resource mass.
+	+ Tweaked ServiceModule and Default tank insulation values. (service module insulation calculated assuming Inconel/Titanium + vacuum/vapor shielded tanks.)
 * 2015-1024: 10.7.0 (Starwaster) for KSP 1.0.
 	+ Revamped boiloff code for cryogenic propellants to be compatible with KSP 1.0.x thermodynamics
 	+ (tanks will be properly cooled by evaporation of boiled off resources)
