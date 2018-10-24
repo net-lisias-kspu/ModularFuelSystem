@@ -92,7 +92,7 @@ namespace ModularFuelSystem.Tanks
 						HideGUI ();
 						OnActionGroupEditorOpened.Fire ();
 					}
-					var age = EditorActionGroups.Instance;
+					EditorActionGroups age = EditorActionGroups.Instance;
 					if (tank_module && !age.GetSelectedParts ().Contains (tank_module.part)) {
 						HideGUI ();
 					}

@@ -50,7 +50,7 @@ namespace ModularFuelSystem.Tanks
 			tankList.Load (node);
 
 			for (int i = tankList.Count - 1; i >= 0; --i) {
-				var tank = tankList[i];
+				FuelTank tank = tankList[i];
 				if (!tank.resourceAvailable) {
 					//log.warn ("Unable to initialize tank definition for resource \"" + tank.name + "\" in tank definition \"" + name + "\" as this resource is not defined.");
 					tankList.RemoveAt (i);

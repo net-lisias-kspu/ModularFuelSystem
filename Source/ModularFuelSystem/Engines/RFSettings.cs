@@ -102,8 +102,8 @@ namespace ModularFuelSystem
                 return version;
             }
 
-            var asm = Assembly.GetCallingAssembly ();
-            var title = MFSVersionReport.GetAssemblyTitle (asm);
+			Assembly asm = Assembly.GetCallingAssembly ();
+			string title = MFSVersionReport.GetAssemblyTitle (asm);
             version = title + " " + MFSVersionReport.GetAssemblyVersionString (asm);
 
             return version;

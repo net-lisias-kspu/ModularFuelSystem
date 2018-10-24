@@ -15,10 +15,10 @@ namespace ModularFuelSystem {
         {
             string version = assembly.GetName().Version.ToString ();
 
-            var cattrs = assembly.GetCustomAttributes(true);
-            foreach (var attr in cattrs) {
+			object[] cattrs = assembly.GetCustomAttributes(true);
+            foreach (object attr in cattrs) {
                 if (attr is AssemblyInformationalVersionAttribute) {
-                    var ver = attr as AssemblyInformationalVersionAttribute;
+					AssemblyInformationalVersionAttribute ver = attr as AssemblyInformationalVersionAttribute;
                     version = ver.InformationalVersion;
                     break;
                 }
@@ -31,10 +31,10 @@ namespace ModularFuelSystem {
         {
             string title = assembly.GetName().Name;
 
-            var cattrs = assembly.GetCustomAttributes(true);
-            foreach (var attr in cattrs) {
+			object[] cattrs = assembly.GetCustomAttributes(true);
+            foreach (object attr in cattrs) {
                 if (attr is AssemblyTitleAttribute) {
-                    var ver = attr as AssemblyTitleAttribute;
+					AssemblyTitleAttribute ver = attr as AssemblyTitleAttribute;
                     title = ver.Title;
                     break;
                 }
@@ -48,8 +48,8 @@ namespace ModularFuelSystem {
 			if (version != null) {
 				return version;
 			}
-			var asm = Assembly.GetCallingAssembly ();
-			var title = GetAssemblyTitle (asm);
+			Assembly asm = Assembly.GetCallingAssembly ();
+			string title = GetAssemblyTitle (asm);
 			version = title + " " + GetAssemblyVersionString (asm);
 			return version;
 		}

@@ -120,7 +120,7 @@ namespace ModularFuelSystem
                         if (tank.amount < tank.maxAmount && tank.fillable && r.flowMode != PartResource.FlowMode.None && d.resourceTransferMode == ResourceTransferMode.PUMP && r.flowState)
                         {
                             double amount = Math.Min(deltaTime * pump_rate * tank.utilization, tank.maxAmount - tank.amount);
-                            var game = HighLogic.CurrentGame;
+							Game game = HighLogic.CurrentGame;
 
                             if (d.unitCost > 0 && game.Mode == Game.Modes.CAREER && Funding.Instance != null)
                             {

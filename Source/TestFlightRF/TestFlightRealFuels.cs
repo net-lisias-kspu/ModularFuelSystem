@@ -22,24 +22,24 @@ namespace TestFlightRF
 
         public void Startup()
         {
-            var burnTimes = new Dictionary<string, float>();
+			Dictionary<string, float> burnTimes = new Dictionary<string, float>();
             foreach (AvailablePart part in PartLoader.LoadedPartsList)
             {
                 // cache up the burn times first
                 burnTimes.Clear();
-                var engineCycles = part.partPrefab.Modules.GetModules<TestFlightReliability_EngineCycle>();
+				List<TestFlightReliability_EngineCycle> engineCycles = part.partPrefab.Modules.GetModules<TestFlightReliability_EngineCycle>();
                 if (engineCycles.Count <= 0)
                     continue;
 
-                foreach (var engineCycle in engineCycles)
+                foreach (TestFlightReliability_EngineCycle engineCycle in engineCycles)
                 {
                     if (engineCycle.engineConfig != "")
                     {
                         burnTimes[engineCycle.engineConfig] = engineCycle.ratedBurnTime;
                     }
                 }
-                // now add that info to the RF configs
-                var allConfigs = part.partPrefab.Modules.GetModules<ModuleEngineConfigs>();
+				// now add that info to the RF configs
+				List<ModuleEngineConfigs> allConfigs = part.partPrefab.Modules.GetModules<ModuleEngineConfigs>();
                 if (allConfigs.Count <= 0)
                     continue;
 

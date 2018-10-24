@@ -700,7 +700,7 @@ namespace ModularFuelSystem.Tanks
 				double tankDryMass = 0;
 				for (int i = 0; i < tankList.Count; i++)
                 {
-					var tank = tankList[i];
+					FuelTank tank = tankList[i];
 					tankDryMass += tank.maxAmount * tank.mass / tank.utilization;
 
 				}
@@ -811,7 +811,7 @@ namespace ModularFuelSystem.Tanks
 
 		public void RaiseResourceInitialChanged(PartResource resource, double amount)
 		{
-			var data = new BaseEventDetails (BaseEventDetails.Sender.USER);
+			BaseEventDetails data = new BaseEventDetails (BaseEventDetails.Sender.USER);
 			data.Set<PartResource> ("resource", resource);
 			data.Set<double> ("amount", amount);
 			part.SendEvent ("OnResourceInitialChanged", data, 0);
@@ -819,7 +819,7 @@ namespace ModularFuelSystem.Tanks
 
 		public void RaiseResourceMaxChanged (PartResource resource, double amount)
 		{
-			var data = new BaseEventDetails (BaseEventDetails.Sender.USER);
+			BaseEventDetails data = new BaseEventDetails (BaseEventDetails.Sender.USER);
 			data.Set<PartResource> ("resource", resource);
 			data.Set<double> ("amount", amount);
 			part.SendEvent ("OnResourceMaxChanged", data, 0);

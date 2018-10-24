@@ -1482,7 +1482,7 @@ namespace ModularFuelSystem
             if (pModule != null && part.partInfo != null)
             {
                 GUILayout.BeginHorizontal();
-                var ratedBurnTime = string.Empty;
+				string ratedBurnTime = string.Empty;
                 if (config.HasValue("tfRatedBurnTime"))
                 {
                     ratedBurnTime += config.GetValue("tfRatedBurnTime") + "\n";

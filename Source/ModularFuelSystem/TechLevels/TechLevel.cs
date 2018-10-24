@@ -105,7 +105,7 @@ namespace ModularFuelSystem.TechLevels
         // loads a given techlevel from global techlevels-style node
         public bool Load(ConfigNode node, int level)
         {
-            var tLs = node.GetNodes("TECHLEVEL");
+			ConfigNode[] tLs = node.GetNodes("TECHLEVEL");
             if (tLs.Count() > 0)
             {
                 foreach (ConfigNode n in tLs)
@@ -163,7 +163,7 @@ namespace ModularFuelSystem.TechLevels
             // check local techlevel configs
             if (cfg != null)
             {
-                var tLs = cfg.GetNodes("TECHLEVEL");
+				ConfigNode[] tLs = cfg.GetNodes("TECHLEVEL");
                 if (tLs.Count() > 0)
                 {
                     foreach (ConfigNode n in tLs)
@@ -178,7 +178,7 @@ namespace ModularFuelSystem.TechLevels
             // check module techlevel configs
             if (mod != null)
             {
-                var tLs = mod.GetNodes("TECHLEVEL");
+				ConfigNode[] tLs = mod.GetNodes("TECHLEVEL");
                 if (tLs.Count() > 0)
                 {
                     foreach (ConfigNode n in tLs)
@@ -258,7 +258,7 @@ namespace ModularFuelSystem.TechLevels
             {
                 if (node.HasValue("name") && node.GetValue("name").Equals(type))
                 {
-                    var tLs = node.GetNodes("TECHLEVEL");
+					ConfigNode[] tLs = node.GetNodes("TECHLEVEL");
                     if (tLs.Count() > 0)
                     {
                         return MaxTL(node);
@@ -287,7 +287,7 @@ namespace ModularFuelSystem.TechLevels
             {
                 if (node.HasValue("name") && node.GetValue("name").Equals(type))
                 {
-                    var tLs = node.GetNodes("TECHLEVEL");
+					ConfigNode[] tLs = node.GetNodes("TECHLEVEL");
                     if (tLs.Count() > 0)
                     {
                         return MinTL(node);

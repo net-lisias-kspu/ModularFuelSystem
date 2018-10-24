@@ -200,7 +200,7 @@ namespace ModularFuelSystem
 
         private static IEnumerable<Type> getAllTypes()
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 Type[] types;
                 try
@@ -212,7 +212,7 @@ namespace ModularFuelSystem
                     types = Type.EmptyTypes;
                 }
 
-                foreach (var type in types)
+                foreach (Type type in types)
                 {
                     yield return type;
                 }

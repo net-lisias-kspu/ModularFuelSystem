@@ -534,7 +534,7 @@ namespace ModularFuelSystem
             UpdateSolver(ambientTherm, 0d, Vector3d.zero, 0d, true, true, false);
             double thrustASL = (engineSolver.GetThrust() * 0.001d);
 
-            var weight = part.mass * (Planetarium.fetch?.Home?.GeeASL * 9.80665 ?? 9.80665);
+			double weight = part.mass * (Planetarium.fetch?.Home?.GeeASL * 9.80665 ?? 9.80665);
 
             if (atmChangeFlow) // If it's a jet
             {
@@ -566,7 +566,7 @@ namespace ModularFuelSystem
 
                 if (throttleLocked || minThrottle == 1f)
                 {
-                    var suffix = throttleLocked ? "throttle locked" : "unthrottleable";
+					string suffix = throttleLocked ? "throttle locked" : "unthrottleable";
                     if (thrustASL != thrustVac)
                     {
                         output += String.Format("<b>Thrust (Vac): </b>{0} kN (TWR {1}), {2}\n", (thrustVac).ToString("0.0##"), (thrustVac / weight).ToString("0.0##"), suffix);

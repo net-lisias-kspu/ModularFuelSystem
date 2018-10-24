@@ -24,11 +24,11 @@ namespace ModularFuelSystem {
 		void onGUIEditorToolbarReady ()
 		{
 			if (icon == null) {
-				var iconloader = PartCategorizer.Instance.iconLoader;
+				IconLoader iconloader = PartCategorizer.Instance.iconLoader;
 				icon = iconloader.GetIcon("R&D_node_icon_fuelsystems");
 			}
-			var cat = PartCategorizer.Instance.filters.Find (c => c.button.categoryName == "Filter by Module");
-			var subcat = cat.subcategories.Find (c => c.button.categoryName == "Modular Fuel Tank");
+			PartCategorizer.Category cat = PartCategorizer.Instance.filters.Find (c => c.button.categoryName == "Filter by Module");
+			PartCategorizer.Category subcat = cat.subcategories.Find (c => c.button.categoryName == "Modular Fuel Tank");
 			subcat.button.SetIcon (icon);
 
 			cat = PartCategorizer.Instance.filters.Find (c => c.button.categoryName == "Filter by Function");
@@ -44,7 +44,7 @@ namespace ModularFuelSystem {
 			mftItems.Clear ();
 			foreach (AvailablePart ap in PartLoader.LoadedPartsList) {
 				Part part = ap.partPrefab;
-				var mft = part.FindModuleImplementing<Tanks.ModuleFuelTanks> ();
+				Tanks.ModuleFuelTanks mft = part.FindModuleImplementing<Tanks.ModuleFuelTanks> ();
 				if (mft != null) {
 					mftItems.Add (ap.name);
 				}
