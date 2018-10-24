@@ -50,9 +50,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="assembly\AssemblyInfoRF.cs" />
-    <Compile Include="assembly\Checkers.cs" />
-    <Compile Include="assembly\VersionReport.cs" />
     <Compile Include="EntryCosts\EngineConfigUpgrade.cs" />
     <Compile Include="Engines\ModuleEngineConfigs.cs" />
     <Compile Include="Engines\RFSettings.cs" />
@@ -82,8 +79,26 @@
     <Compile Include="Utilities\Utilities.cs" />
     <Compile Include="Utilities\Styles.cs" />
     <Compile Include="MFSSettings.cs" />
+    <Compile Include="Properties\VersionRF.cs">
+      <DependentUpon>VersionRF.tt</DependentUpon>
+    </Compile>
+    <Compile Include="assembly\Checkers.cs">
+      <Link>Properties\Checkers.cs</Link>
+    </Compile>
+    <Compile Include="assembly\VersionReport.cs">
+      <Link>Properties\VersionReport.cs</Link>
+    </Compile>
+    <Compile Include="assembly\AssemblyInfoRF.cs">
+      <Link>Properties\AssemblyInfoRF.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <None Include="Properties\VersionRF.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VersionRF.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent></PreBuildEvent>
   </PropertyGroup>
