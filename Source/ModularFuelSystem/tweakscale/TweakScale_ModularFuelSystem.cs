@@ -1,32 +1,15 @@
-﻿using System;
-using System.Linq;
-using TweakScale;
+﻿using TweakScale;
 
 namespace RealFuels
 {
-    class TweakScaleModularFuelTanksUpdater : IRescalable<RealFuels.Tanks.ModuleFuelTanks>
+    public class TweakScaleModularFuelTanksUpdater : IRescalable<RealFuels.Tanks.ModuleFuelTanks>
     {
-        private RealFuels.Tanks.ModuleFuelTanks _module;
+		private RealFuels.Tanks.ModuleFuelTanks Module { get; }
+		private Part Part => Module.part;
 
-        private RealFuels.Tanks.ModuleFuelTanks Module
+		public TweakScaleModularFuelTanksUpdater(RealFuels.Tanks.ModuleFuelTanks pm)
         {
-            get
-            {
-                return _module;
-            }
-        }
-
-        private Part Part
-        {
-            get
-            {
-                return _module.part;
-            }
-        }
-
-        public TweakScaleModularFuelTanksUpdater(RealFuels.Tanks.ModuleFuelTanks pm)
-        {
-            _module = pm;
+			Module = pm;
         }
 
         public void OnRescale(ScalingFactor factor)
