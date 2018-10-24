@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-source ./CONFIG.inc
-
-clean() {
+clean_bin() {
 	local DLL=$1.dll
 
 	find ./bin -name "$DLL" -delete
@@ -14,12 +12,20 @@ clean() {
 	rm -f "${KSP_DEV}/GameData/$TARGETBINDIR/$DLL"
 }
 
-VERSIONFILE=$PACKAGE.version
+clean() {
+	VERSIONFILE=$PACKAGE.version
 
-rm -f "./GameData/$TARGETDIR/$VERSIONFILE"
-rm -f "./GameData/$TARGETDIR/CHANGE_LOG.md"
-rm -f "./GameData/$TARGETDIR/README.md"
-rm -f "./GameData/$TARGETDIR/*.LICENSE"
-for dll in Scale Scale_Redist Scale_TweakableEverything ; do
-    clean $dll
-done
+	rm -f "./GameData/$TARGETDIR/$VERSIONFILE"
+	rm -f "./GameData/$TARGETDIR/CHANGE_LOG.md"
+	rm -f "./GameData/$TARGETDIR/README.md"
+	rm -f "./GameData/$TARGETDIR/*.LICENSE"
+	for dll in Scale Scale_Redist Scale_TweakableEverything ; do
+		clean_bin $dll
+	done
+}
+
+source ./CONFIG.mft.inc
+clean
+
+source ./CONFIG.rf.inc
+clean

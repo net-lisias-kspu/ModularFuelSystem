@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-source ./CONFIG.inc
-
 check() {
 	if [ ! -d "./GameData/$TARGETBINDIR/" ] ; then
 		rm -f "./GameData/$TARGETBINDIR/"
@@ -17,7 +15,7 @@ deploy_dev() {
 	fi
 }
 
-deploy() {
+deploy_bin() {
 	local DLL=$1
 
 	if [ -f "./bin/Release/$DLL.dll" ] ; then
@@ -39,16 +37,24 @@ deploy_md() {
 	sed $MD -e "s/!\\[.\+\\]\\(.\+\\)//g" > "./GameData/$TARGETDIR"/$MD
 }
 
-VERSIONFILE=$PACKAGE.version
+deploy() {
+	VERSIONFILE=$PACKAGE.version
+	check
+	cp $VERSIONFILE "./GameData/$TARGETDIR"
+	cp CHANGE_LOG.md "./GameData/$TARGETDIR"
+	cp *LICENSE "./GameData/$TARGETDIR"
+	cp NOTICE "./GameData/$TARGETDIR"
+	deploy_md README.md
 
-check
-cp $VERSIONFILE "./GameData/$TARGETDIR"
-cp CHANGE_LOG.md "./GameData/$TARGETDIR"
-cp *LICENSE "./GameData/$TARGETDIR"
-cp NOTICE "./GameData/$TARGETDIR"
-deploy_md README.md
+	for dll in $* ; do
+#		deploy_dev $dll
+		deploy_bin $dll
+	done
+}
 
-for dll in $PACKAGE; do
-#    deploy_dev $dll
-    deploy $dll
-done
+
+source ./CONFIG.mft.inc
+deploy Scale_Redist $PACKAGE TweakScale_$PACKAGE
+
+source ./CONFIG.rf.inc
+deploy Scale_Redist $PACKAGE TweakScale_$PACKAGE TestFlightRF

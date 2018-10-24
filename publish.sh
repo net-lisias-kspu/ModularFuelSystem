@@ -3,10 +3,6 @@
 # not yet!
 exit 0
 
-source ./CONFIG.inc
-
-VERSIONFILE=$PACKAGE.version
-
 deploy_md() {
 	local MD=$1
 	local TARGET=$2
@@ -24,6 +20,15 @@ deploy_assets() {
 	cd $cur_path
 }
 
-scp -i $SSH_ID ./GameData/$PACKAGE/$VERSIONFILE $SITE:/$TARGET_CONTENT_PATH
-deploy_assets ./PR_material ./PR_material/$PACKAGE
-deploy_md README.md $PACKAGE.md
+deploy() {
+	VERSIONFILE=$PACKAGE.version
+	scp -i $SSH_ID ./GameData/$PACKAGE/$VERSIONFILE $SITE:/$TARGET_CONTENT_PATH
+	deploy_assets ./PR_material ./PR_material/$PACKAGE
+	deploy_md README.md $PACKAGE.md
+}
+
+source ./CONFIG.inc
+deploy
+
+source ./CONFIG.inc
+deploy
