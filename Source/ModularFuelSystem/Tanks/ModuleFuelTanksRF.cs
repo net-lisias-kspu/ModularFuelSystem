@@ -177,12 +177,11 @@ namespace ModularFuelSystem.Tanks
                     }
                 }
                 double num20 = Math.Max(0.0, Math.Min(val4, val3));
-                print("part.ptd.skinInteralConductionFlux = " + part.ptd.skinInteralConductionFlux.ToString("F16"));
-                print("num15                 = " + num15.ToString("F16"));
-                print("num20 (unknownFactor) = " + num20.ToString("F16"));
-                print("num14                 = " + num14.ToString("F16"));
+                log.dbg("part.ptd.skinInteralConductionFlux = {0}", part.ptd.skinInteralConductionFlux.ToString("F16"));
+                log.dbg("num15                 = {0}", num15.ToString("F16"));
+                log.dbg("num20 (unknownFactor) = {0}", num20.ToString("F16"));
+                log.dbg("num14                 = {0}", num14.ToString("F16"));
             }
-            //Debug.Log("part.skinInteralConductionFlux = " + part.ptd.skinInteralConductionFlux.ToString("F16"));
         }
 
         partial void CalculateMassRF(ref double mass)
@@ -208,7 +207,7 @@ namespace ModularFuelSystem.Tanks
 
         public void FixedUpdate()
         {
-            //print ("[Real Fuels]" + Time.time.ToString ());
+            log.dbg("{0}", Time.time);
             if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready)
             {
                 if (RFSettings.Instance.debugBoilOff)
@@ -265,7 +264,7 @@ namespace ModularFuelSystem.Tanks
             if (deltaTime > 0)
             {
                 double deltaTimeRecip = 1d / deltaTime;
-                //Debug.Log("internalFlux = " + part.thermalInternalFlux.ToString() + ", thermalInternalFluxPrevious =" + part.thermalInternalFluxPrevious.ToString() + ", analytic internal flux = " + previewInternalFluxAdjust.ToString());
+                log.detail("internalFlux = {0}, thermalInternalFluxPrevious = {1}, analytic internal flux = {2}", part.thermalInternalFlux, part.thermalInternalFluxPrevious, previewInternalFluxAdjust);
 
                 if (RFSettings.Instance.debugBoilOff)
                 {
@@ -323,10 +322,8 @@ namespace ModularFuelSystem.Tanks
                         if (deltaTemp > 0)
                         {
 #if DEBUG
-                        if (analyticalMode)
-                            print("Tank " + tank.name + " surface area = " + tank.totalArea);
+	                        if (analyticalMode) log.dbg("Tank {0} surface area = {1}", tank.name, tank.totalArea);
 #endif
-
                             double wettedArea = tank.totalArea;// disabled until proper wetted vs ullage conduction can be done (tank.amount / tank.maxAmount);
 
                             if (tank.isDewar)
@@ -342,7 +339,7 @@ namespace ModularFuelSystem.Tanks
                             if (!double.IsNaN(Q))
                                 massLost = Q / tank.vsp;
                             else
-                                DebugLog("Q = NaN! W - T - F!!!");
+                                log.dbg("Q = NaN! W - T - F!!!");
 
                             if (RFSettings.Instance.debugBoilOff)
                             {
@@ -357,13 +354,12 @@ namespace ModularFuelSystem.Tanks
                         double lossAmount = massLost / tank.density;
 
                         if (double.IsNaN(lossAmount))
-                            print(tank.name + " lossAmount is NaN!");
+                            log.dbg("{0} lossAmount is NaN!", tank.name);
                         else
                         {
                             if (lossAmount > tank.amount)
                             {
-
-                                tank.amount = 0d;
+								tank.amount = 0d;
                             }
                             else
                             {
@@ -401,21 +397,20 @@ namespace ModularFuelSystem.Tanks
                                     if (TimeWarp.CurrentRate > 1)
                                         previewInternalFluxAdjust += heatLost;
                                     else
-                                        print("boiloff function running with delta time of " + deltaTime.ToString() + "(vessel.lastUT =" + (Planetarium.GetUniversalTime() - vessel.lastUT).ToString("F4") + " seconds ago)");
+                                        log.dbg("boiloff function running with delta time of {0} (vessel.lastUT = {1} seconds ago)", deltaTime, (Planetarium.GetUniversalTime() - vessel.lastUT).ToString("F4"));
 #if DEBUG
-                            if (deltaTime > 0)
-                                print(part.name + " deltaTime = " + deltaTime + ", heat lost = " + heatLost + ", thermalMassReciprocal = " + part.thermalMassReciprocal);
+                                    if (deltaTime > 0) log.dbg("{0} deltaTime = {1}, heat lost = {2}, thermalMassReciprocal = {3}", part.name, deltaTime, heatLost, part.thermalMassReciprocal);
 #endif
                                 }
                             }
                             else
                             {
-                                DebugLog("WHO WOULD WIN? Some Well Written Code or One Misplaced NaN?");
-                                DebugLog("heatLost = " + Q.ToString());
-                                DebugLog("deltaTime = " + deltaTime.ToString());
-                                DebugLog("deltaTimeRecip = " + deltaTimeRecip.ToString());
-                                DebugLog("massLost = " + massLost.ToString());
-                                DebugLog("tank.vsp = " + tank.vsp.ToString());
+                                log.dbg("WHO WOULD WIN? Some Well Written Code or One Misplaced NaN?");
+                                log.dbg("heatLost = {0}", Q);
+                                log.dbg("deltaTime = {0}", deltaTime);
+                                log.dbg("deltaTimeRecip = {0}", deltaTimeRecip);
+                                log.dbg("massLost = {0}" + massLost);
+                                log.dbg("tank.vsp = {0}" + tank.vsp);
                             }
                         }
                     }
@@ -485,7 +480,7 @@ namespace ModularFuelSystem.Tanks
             // Thought: cube YN/YP can be used to find the part diameter / circumference... X or Z finds the length
             // Also should try to determine if tank has a common bulkhead - and adjust heat flux into individual tanks accordingly
 #if DEBUG
-            print("CalculateTankArea() running");
+            log.dbg("CalculateTankArea() running");
 #endif
 
             if (HighLogic.LoadedSceneIsEditor)
@@ -505,8 +500,8 @@ namespace ModularFuelSystem.Tanks
                 totalTankArea += part.DragCubes.WeightedArea[i];
             }
 #if DEBUG
-            Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] Part WeightedArea: " + part.name + " = " + totalTankArea.ToString("F2"));
-            Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] Part Area: " + part.name + " = " + part.DragCubes.Area.ToString("F2"));
+            log.info("[ModularFuelSystem.ModuleFuelTankRF] Part WeightedArea: {0} = {1}", part.name, totalTankArea.ToString("F2"));
+            log.info("[ModularFuelSystem.ModuleFuelTankRF] Part Area: {0} = {1}", part.name, part.DragCubes.Area.ToString("F2"));
 #endif
             // This allows a rough guess as to individual tank surface area based on ratio of tank volume to total volume but it breaks down at very small fractions
             // So use greater of spherical calculation and tank ratio of total area.
@@ -531,11 +526,11 @@ namespace ModularFuelSystem.Tanks
 
                     if (RFSettings.Instance.debugBoilOff)
                     {
-                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + tank.name + ".tankRatio = " + tank.tankRatio.ToString());
-                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + tank.name + ".maxAmount = " + tankMaxAmount.ToString());
-                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + part.name + ".totalTankArea = " + totalTankArea.ToString());
-                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] Tank surface area = " + tank.totalArea.ToString());
-                        DebugLog("tank Dewar status = " + tank.isDewar.ToString());
+                        log.detail("{0}.tankRatio = {1}", tank.name, tank.tankRatio);
+                        log.detail("{0}.maxAmount = {1}", tank.name, tankMaxAmount);
+                        log.detail("{0}.totalTankArea = {1}", part.name, totalTankArea);
+                        log.detail("Tank surface area = {0}", tank.totalArea);
+                        log.dbg("tank Dewar status = {0}", tank.isDewar.ToString());
                     }
                 }
             }
@@ -545,7 +540,7 @@ namespace ModularFuelSystem.Tanks
 
         public void OnVesselWasModified(Vessel v)
         {
-            Debug.Log("ModuleFuelTanksRF.OnVesselWasModified()");
+            log.detail("ModuleFuelTanksRF.OnVesselWasModified()");
             if (v != null && v == this.vessel)
                 CalculateTankArea();
         }
@@ -578,10 +573,8 @@ namespace ModularFuelSystem.Tanks
         {
             //if (analyticInternalTemp > lowestTankTemperature)
 #if DEBUG
-            if(this.supportsBoiloff)
-                print(part.name + " Analytic Temp = " + analyticTemp.ToString() + ", Analytic Internal = " + predictedInternalTemp.ToString() + ", Analytic Skin = " + predictedSkinTemp.ToString());
+            if(this.supportsBoiloff) log.dbg("{0} Analytic Temp = {1}, Analytic Internal = {2}, Analytic Skin = {3}", part.name, analyticTemp, predictedInternalTemp, predictedSkinTemp);
 #endif
-            
             analyticSkinTemp = predictedSkinTemp;
             analyticInternalTemp = predictedInternalTemp;
 
@@ -623,15 +616,9 @@ namespace ModularFuelSystem.Tanks
             previewInternalFluxAdjust = 0;
             sunAndBodyFlux = sunAndBodyIn;
             if (TimeWarp.CurrentRate == 1)
-                DebugLog("AnalyticInfo being called with: sunAndBodyIn = " + sunAndBodyIn.ToString()
-                         + ", backgroundRadiation = " + backgroundRadiation.ToString()
-                         + ", radArea = "+ radArea.ToString()
-                         + ", absEmissRatio = " + absEmissRatio.ToString()
-                         + ", internalFlux = " + internalFlux.ToString()
-                         + ", convCoeff = " + convCoeff.ToString()
-                         + ", ambientTemp = " + ambientTemp.ToString()
-                         + ", maxPartTemp = " + maxPartTemp.ToString()
-                        );
+                log.dbg("AnalyticInfo being called with: sunAndBodyIn = {0}, backgroundRadiation = {1}, radArea = {2}, absEmissRatio = {3}, internalFlux = {4}, convCoeff = {5}, ambientTemp = {6}, maxPartTemp = {7}"
+                        , sunAndBodyIn, backgroundRadiation, radArea, absEmissRatio, internalFlux, convCoeff, ambientTemp, maxPartTemp
+				);
             //previewInternalFluxAdjust = internalFlux;
             //float deltaTime = (float)(Planetarium.GetUniversalTime() - vessel.lastUT);
             //if (this.supportsBoiloff)
@@ -645,16 +632,6 @@ namespace ModularFuelSystem.Tanks
             return previewInternalFluxAdjust;
         }
         #endregion
-
-        static void print(string msg)
-        {
-            MonoBehaviour.print("[ModularFuelSystem.ModuleFuelTankRF] " + msg);
-        }
-
-        static void DebugLog(string msg)
-        {
-            Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + msg);
-        }
 
         #region Cryogenics
         // TODO MLI convective coefficient needs some research. I chose a value that would allow MLI in-atmo to provide better insulation than a naked tank.

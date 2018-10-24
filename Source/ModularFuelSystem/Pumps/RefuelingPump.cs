@@ -73,7 +73,7 @@ namespace ModularFuelSystem
             }
 
             if (flightIntegrator == null)
-                Debug.LogError("[RefuelingPump] could not find flight integrator!");
+                log.error("could not find flight integrator!");
         }
 
         private void SetupGUI()
@@ -156,5 +156,7 @@ namespace ModularFuelSystem
                 }
             }
         }
+        
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<RefuelingPump>(true);
     }
 }

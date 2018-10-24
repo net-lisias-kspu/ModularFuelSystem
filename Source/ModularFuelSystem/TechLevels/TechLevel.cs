@@ -225,7 +225,7 @@ namespace ModularFuelSystem.TechLevels
             }
 
             // check global
-            //Debug.Log("*RFEng* Fallback to global for type " + type + ", TL " + level);
+            //log.detail("Fallback to global for type {0}, TL {1}", type, level);
             return Load(type, level);
         }
 

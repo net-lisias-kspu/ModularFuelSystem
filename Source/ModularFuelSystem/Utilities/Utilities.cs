@@ -29,18 +29,18 @@ namespace ModularFuelSystem
         {
             if (fc == null)
             {
-                Debug.LogError("*PC* ERROR: FC is null!");
+                log.error("FC is null!");
                 return;
             }
             if (fc.Curve == null)
             {
-                Debug.LogError("*PC* ERROR: FC's curve is null!");
+                log.error("FC's curve is null!");
                 return;
             }
             int len = fc.Curve.keys.Length;
-            Debug.Log("Curve has " + len + " keys.");
+            log.info("Curve has {0} keys.", len);
             for (int i = 0; i < len; ++i)
-                Debug.Log("key = " + fc.Curve.keys[i].time + " " + fc.Curve.keys[i].value + " " + fc.Curve.keys[i].inTangent + " " + fc.Curve.keys[i].outTangent);
+                log.info("key = {0} {1} {2} {3}", fc.Curve.keys[i].time, fc.Curve.keys[i].value, fc.Curve.keys[i].inTangent, fc.Curve.keys[i].outTangent);
         }
 
         public string GetNodeNames(List<ConfigNode> list)
@@ -150,5 +150,7 @@ namespace ModularFuelSystem
             return list;
         }
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<Utilities>(true);
     }
 }

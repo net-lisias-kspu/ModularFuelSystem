@@ -56,8 +56,10 @@ namespace ModularFuelSystem {
 
 		void Start ()
 		{
-			Debug.Log (GetVersion ());
+			log.info (GetVersion ());
 			Destroy (this);
 		}
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<MFSVersionReport>(true);
 	}
 }

@@ -28,3 +28,5 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyKeyFile("")]
 
 [assembly: KSPAssembly("ModularFuelTanks", ModularFuelTanks.Version.major, ModularFuelTanks.Version.minor)]
+
+[assembly: KSPAssemblyDependency("KSPe", 2, 0)]

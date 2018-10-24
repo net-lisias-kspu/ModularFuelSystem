@@ -172,12 +172,12 @@ namespace ModularFuelSystem
             {
                 if (node.GetValue("curveResource") != curveResource)
                 {
-                    Debug.LogError("*RFE* ERROR: curveResource doesn't match node's!");
+                    log.error("curveResource doesn't match node's!");
                     curveResource = node.GetValue("curveResource");
                 }
                 if (thrustCurve == null)
                 {
-                    Debug.LogError("*RFE* ERROR: have curve node but thrustCurve is null!");
+                    log.error("have curve node but thrustCurve is null!");
                     thrustCurve = new FloatCurve();
                     thrustCurve.Load(node.GetNode("thrustCurve"));
                 }
@@ -250,7 +250,7 @@ namespace ModularFuelSystem
             if (node.HasValue("pressureFed"))
             {
                 bool.TryParse(node.GetValue("pressureFed"), out pressureFed);
-                Debug.Log(this.name + ".pressureFed = " + this.pressureFed);
+                log.info(this.name + "{0}.pressureFed = {1}",this.name, this.pressureFed);
             }
             ullageSet.SetUllageEnabled(ullage);
 
@@ -704,7 +704,8 @@ namespace ModularFuelSystem
                                         if (amt < req)
                                         {
                                             minResource = Math.Min(minResource, (amt / req));
-                                            print("*RF* part " + part.partInfo.title + " requested " + req + " " + ignitionResources[i].name + " but got " + amt + ". MinResource now " + minResource);
+                                            log.dbg("part {0} requested {1} {2} but got {3}. MinResource now {4}"
+                                                    ,part.partInfo.title, req, ignitionResources[i].name, amt, minResource);
                                         }
                                     }
                                 }
@@ -736,5 +737,7 @@ namespace ModularFuelSystem
             }
         }
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<ModuleEnginesRF>(true);
     }
 }

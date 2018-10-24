@@ -103,7 +103,7 @@ namespace ModularFuelSystem
         {
             if (PartLoader.Instance == null || PartLoader.LoadedPartsList == null)
             {
-                Debug.LogError("*RFUM: ERROR: Partloader instance null or list null!");
+                log.error("Partloader instance null or list null!");
                 return;
             }
 
@@ -237,7 +237,7 @@ namespace ModularFuelSystem
             TLUpgrade tU = null;
             if (techLevelUpgrades.TryGetValue(tUName, out tU))
                 return tU.currentTL;
-            Debug.LogError("*RFUM: ERROR: TL " + tUName + " does not exist!");
+            log.error("TL {0} does not exist!", tUName);
             return -1;
         }
 
@@ -250,7 +250,7 @@ namespace ModularFuelSystem
                     tU.currentTL = newVal;
             }
             else
-                Debug.LogError("*RFUM: ERROR: TL " + tUName + " does not exist!");
+                log.error("TL {0} does not exist!", tUName);
         }
         public double TLEntryCost(string tUName)
         {
@@ -258,7 +258,7 @@ namespace ModularFuelSystem
             if (techLevelUpgrades.TryGetValue(tUName, out tU))
                 return tU.techLevelEntryCost;
 
-            Debug.LogError("*RFUM: ERROR: TL " + tUName + " does not exist!");
+            log.error("TL " + tUName + " does not exist!", tUName);
             return 0d;
         }
         public double TLSciEntryCost(string tUName)
@@ -266,7 +266,7 @@ namespace ModularFuelSystem
             TLUpgrade tU = null;
             if (techLevelUpgrades.TryGetValue(tUName, out tU))
                 return tU.techLevelSciEntryCost;
-            Debug.LogError("*RFUM: ERROR: TL " + tUName + " does not exist!");
+            log.error("TL {0} does not exist!", tUName);
             return 0d;
         }
         public bool PurchaseTL(string tUName, int tl, double multiplier)
@@ -292,7 +292,8 @@ namespace ModularFuelSystem
             SetTLUnlocked(tUName, tl);
             return true;
         }
-
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<EntryCostManager>(true);
     }
 }

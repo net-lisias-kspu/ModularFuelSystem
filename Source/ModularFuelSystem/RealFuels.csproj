@@ -47,6 +47,9 @@
     <Reference Include="SolverEngines">
       <HintPath>..\..\..\..\..\LIB\plugins\SolverEngines.dll</HintPath>
     </Reference>
+    <Reference Include="KSPe">
+      <HintPath>..\..\..\..\..\LIB\plugins\KSPe.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

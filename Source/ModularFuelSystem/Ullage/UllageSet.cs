@@ -28,7 +28,7 @@ namespace ModularFuelSystem.Ullage
         #region Setup
         public UllageSet(ModuleEnginesRF eng)
         {
-            MonoBehaviour.print("*U* Ullage constructor called on " + eng.part.name);
+            log.dbg("Ullage constructor called on " + eng.part.name);
             engine = eng;
             ullageSim = new UllageSimulator(engine.part.name);
             if (engine.vessel != null)
@@ -118,7 +118,7 @@ namespace ModularFuelSystem.Ullage
             if (!HighLogic.LoadedSceneIsEditor && node.HasNode("UllageSim"))
             {
 #if DEBUG
-                MonoBehaviour.print("*U* Ullage load called on " + engine.part.name);
+                log.dbg("Ullage load called on {0}", engine.part.name);
 #endif
                 ullageSim.Load(node.GetNode("UllageSim"));
             }
@@ -198,5 +198,7 @@ namespace ModularFuelSystem.Ullage
             module = newModule;
         }
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<UllageSet>(true);
     }
 }

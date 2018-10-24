@@ -55,7 +55,7 @@ namespace ModularFuelSystem
             string id = GetPartIdentifier(p);
             if (overrides.ContainsKey(id))
             {
-                Debug.Log("*MFT* ERROR: overrides already stored for " + id);
+                log.error("overrides already stored for " + id);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace ModularFuelSystem
             {
                 return overrides[id];
             }
-            Debug.Log("*MFT* WARNING: no entry in overrides for " + id);
+            log.warn("no entry in overrides for " + id);
             return new ConfigNode[0];
         }
 
@@ -112,7 +112,7 @@ namespace ModularFuelSystem
 
 
             ConfigNode node = GameDatabase.Instance.GetConfigNodes ("MFSSETTINGS").LastOrDefault ();
-            Debug.Log ("[MFS] Loading global settings");
+            log.info ("Loading global settings");
 
 			if (node != null) {
 				bool tb;
@@ -154,11 +154,13 @@ namespace ModularFuelSystem
 
             foreach (ConfigNode defNode in GameDatabase.Instance.GetConfigNodes ("TANK_DEFINITION")) {
                 if (tankDefinitions.Contains (defNode.GetValue ("name"))) {
-                    Debug.LogWarning ("[MFS] Ignored duplicate definition of tank type " + defNode.GetValue ("name"));
+                    log.warn ("Ignored duplicate definition of tank type " + defNode.GetValue ("name"));
                 } else {
                     tankDefinitions.Add (new Tanks.TankDefinition (defNode));
 				}
             }
         }
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<MFSSettings>(true);
     }
 }

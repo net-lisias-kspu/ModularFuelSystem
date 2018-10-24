@@ -379,7 +379,7 @@ namespace ModularFuelSystem.Tanks
                         string loadedTypes = "";
                         foreach (TankDefinition d2 in MFSSettings.tankDefinitions)
                             loadedTypes += " " + d2.name;
-                        Debug.LogError("Unable to find tank definition for type \"" + curType + "\". Available types are:" + loadedTypes);
+                        log.error("Unable to find tank definition for type \"{0}\". Available types are: {1}", curType, loadedTypes);
                         continue;
                     }
                     def = MFSSettings.tankDefinitions[curType];
@@ -407,7 +407,7 @@ namespace ModularFuelSystem.Tanks
 			// Copy the tank list from the tank definitiion
 			TankDefinition def;
 			if (!MFSSettings.tankDefinitions.Contains (type)) {
-				Debug.LogError ("Unable to find tank definition for type \"" + type + "\" reverting.");
+				log.error("Unable to find tank definition for type \"{0}\" reverting.", type);
 				type = oldType;
 				return;
 			}
@@ -433,7 +433,7 @@ namespace ModularFuelSystem.Tanks
                 }
                 if (type == oldType) // if we didn't find a new one
                 {
-                    Debug.LogError("Unable to find a type that is tech-available for part " + part.name);
+                    log.error("Unable to find a type that is tech-available for part {0}", part.name);
                     return;
                 }
             }
@@ -649,7 +649,7 @@ namespace ModularFuelSystem.Tanks
 				basemassPV = 0f;
 				return;
 			}
-			Debug.LogWarning ("[MFT] Unable to parse basemass \"" + baseMass + "\"");
+			log.warn ("Unable to parse basemass \"{0}\"", baseMass);
 		}
 
 		private void ParseBaseCost (ConfigNode node)
@@ -678,7 +678,7 @@ namespace ModularFuelSystem.Tanks
 				return;
 			}
 			if (baseCost != "") {
-				Debug.LogWarning ("[MFT] Unable to parse baseCost \"" + baseCost + "\"");
+				log.warn ("Unable to parse baseCost \"{0}\"", baseCost);
 			} else {
 				baseCostPV = defaultBaseCostPV;
 			}
@@ -907,7 +907,7 @@ namespace ModularFuelSystem.Tanks
 
 		public void UpdateUsedBy ()
 		{
-			//print ("*RK* Updating UsedBy");
+			log.dbg("Updating UsedBy");
 
 			usedBy.Clear ();
 
@@ -1015,5 +1015,7 @@ namespace ModularFuelSystem.Tanks
         partial void CalculateMassRF(ref double mass);
 
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<ModuleFuelTanks>(true);
     }
 }

@@ -39,7 +39,7 @@ namespace ModularFuelSystem
             // now fill our dictionary of parts
             if (PartLoader.Instance == null || PartLoader.LoadedPartsList == null)
             {
-                Debug.LogError("*RP-0 EC: ERROR: Partloader instance null or list null!");
+                log.error("RP-0 Partloader instance null or list null!");
                 return;
             }
             for (int a = PartLoader.LoadedPartsList.Count; a-- > 0;)
@@ -125,7 +125,7 @@ namespace ModularFuelSystem
                 foreach (string s in unlockPathTracker)
                     msg += "\n" + s;
 
-                Debug.LogError(msg);*/
+                log.error(msg);*/
                 return 0;
             }
 
@@ -188,5 +188,7 @@ namespace ModularFuelSystem
             }
         }
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<EntryCostDatabase>(true);
     }
 }

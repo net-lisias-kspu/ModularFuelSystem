@@ -46,11 +46,11 @@ namespace ModularFuelSystem.Tanks
                         Add(new FuelTank(tankNode));
                     else
                     {
-                        Debug.LogWarning("[MFS] Ignored duplicate definition of TANK of type " + tankNode.GetValue("name"));
+                        log.warn("Ignored duplicate definition of TANK of type " + tankNode.GetValue("name"));
                     }
                 }
                 else
-                    Debug.LogWarning("[MFS] TANK node invalid, lacks name");
+                    log.warn("TANK node invalid, lacks name");
 			}
 		}
 
@@ -71,5 +71,6 @@ namespace ModularFuelSystem.Tanks
                     this[i].maxAmount = 0;
             }
         }
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelTankList>(true);
 	}
 }

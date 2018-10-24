@@ -85,7 +85,7 @@ namespace ModularFuelSystem
                 if (_instance != null && _instance)
                     return _instance;
 
-                //Debug.Log("*MHE* Loading settings");
+                log.detail("Loading settings");
 
                 GameObject gameObject = new GameObject(typeof(RFSettings).FullName);
                 _instance = gameObject.AddComponent<RFSettings>();
@@ -116,7 +116,7 @@ namespace ModularFuelSystem
 
             ConfigNode node = GameDatabase.Instance.GetConfigNodes("RFSETTINGS").Last();
             
-            Debug.Log("*RF* Loading RFSETTINGS global settings");
+            log.info("Loading RFSETTINGS global settings");
 
             if (node == null)
                 throw new UnityException("*RF* Could not find RF global settings!");
@@ -184,6 +184,7 @@ namespace ModularFuelSystem
             }
             #endregion
         }
+        
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<RFSettings>(true);
     }
-
 }

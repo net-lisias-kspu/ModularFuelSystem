@@ -69,7 +69,7 @@ namespace ModularFuelSystem.Ullage
                 string str = "*U* Sim for " + name + " loaded from node. H,R: " + ullageHeightMin + "/" + ullageHeightMax + ", " + ullageRadialMin + "/" + ullageRadialMax + ". UT: " + UT;
                 if (Planetarium.fetch)
                     str += " with current UT " + Planetarium.GetUniversalTime();
-                MonoBehaviour.print("*U* UllageSim load: " + str);
+                log.dbg("UllageSim load: {0}", str);
 #endif
             }
         }
@@ -105,16 +105,16 @@ namespace ModularFuelSystem.Ullage
             double accThreshSqr = RFSettings.Instance.naturalDiffusionAccThresh;
             accThreshSqr *= accThreshSqr; // square it to compare to sqrMag.
 
-            //if (ventingAcc != 0.0f) Debug.Log("BoilOffAcc: " + ventingAcc.ToString("F8"));
-            //else Debug.Log("BoilOffAcc: No boiloff.");
+            //if (ventingAcc != 0.0f) Log.info("BoilOffAcc: " + ventingAcc.ToString("F8"));
+            //else Log.info("BoilOffAcc: No boiloff.");
             
             Vector3d localAccelerationAmount = localAcceleration * deltaTime;
             Vector3d rotationAmount = rotation * deltaTime;
 
-            //Debug.Log("Ullage: dt: " + deltaTime.ToString("F2") + " localAcc: " + localAcceleration.ToString() + " rotateRate: " + rotation.ToString());
+            //Log.info("Ullage: dt: " + deltaTime.ToString("F2") + " localAcc: " + localAcceleration.ToString() + " rotateRate: " + rotation.ToString());
 
             // Natural diffusion.
-            //Debug.Log("Ullage: LocalAcc: " + localAcceleration.ToString());
+            //Log.info("Ullage: LocalAcc: " + localAcceleration.ToString());
             if (ventingAcc <= RFSettings.Instance.ventingAccThreshold && accSqrMag < accThreshSqr)
             {
                 double ventingConst = Math.Min(1d, (1d - ventingAcc / RFSettings.Instance.ventingAccThreshold) * fuelRatioFactorRecip * utTimeDelta);
@@ -169,27 +169,27 @@ namespace ModularFuelSystem.Ullage
             ullageRadialMin = UtilMath.Clamp(ullageRadialMin - absRotX, 0.0d, 0.9d);
             ullageRadialMax = UtilMath.Clamp(ullageRadialMax - absRotX, 0.1d, 1.0d);
 
-            //Debug.Log("Ullage: Height: (" + ullageHeightMin.ToString("F2") + " - " + ullageHeightMax.ToString("F2") + ") Radius: (" + ullageRadialMin.ToString("F2") + " - " + ullageRadialMax.ToString("F2") + ")");
+            //log.info("Ullage: Height: (" + ullageHeightMin.ToString("F2") + " - " + ullageHeightMax.ToString("F2") + ") Radius: (" + ullageRadialMin.ToString("F2") + " - " + ullageRadialMax.ToString("F2") + ")");
 
             double bLevel = UtilMath.Clamp((ullageHeightMax - ullageHeightMin) * (ullageRadialMax - ullageRadialMin) * 10d * UtilMath.Clamp(8.2d - 8d * fuelRatio, 0.0d, 8.2d) - 1.0d, 0.0d, 15.0d);
-            //Debug.Log("Ullage: bLevel: " + bLevel.ToString("F3"));
+            //log.info("Ullage: bLevel: " + bLevel.ToString("F3"));
 
             double pVertical = UtilMath.Clamp01(1.0d - (ullageHeightMin - 0.1d) * 5d);
-            //Debug.Log("Ullage: pVertical: " + pVertical.ToString("F3"));
+            //log.info("Ullage: pVertical: " + pVertical.ToString("F3"));
 
             double pHorizontal = UtilMath.Clamp01(1.0d - (ullageRadialMin - 0.1d) * 5d);
-            //Debug.Log("Ullage: pHorizontal: " + pHorizontal.ToString("F3"));
+            log.dbg("Ullage: pHorizontal: " + pHorizontal.ToString("F3"));
 
             propellantStability = Math.Max(0.0d, 1.0d - (pVertical * pHorizontal * (0.75d + Math.Sqrt(bLevel))));
 
 #if DEBUG
-            if (propellantStability < 0.5d)
-                MonoBehaviour.print("*US* for part " + name + ", low stability of " + propellantStability
-                    + "\npV/H = " + pVertical + "/" + pHorizontal + ", blevel " + bLevel
-                    + "\nUllage Height Min/Max " + ullageHeightMin + "/" + ullageHeightMax + ", Radial Min/Max " + ullageRadialMin + "/" + ullageRadialMax
-                    + "\nInputs: Time = " + deltaTime + ", UT delta = " + utTimeDelta + ", Acc " + localAcceleration + ", Rot " + rotation + ", FR " + fuelRatio);
+			if (propellantStability < 0.5d)
+				log.dbg("for part {0}, low stability of {1}\npV/H = {2}/{3}, blevel {4}\nUllage Height Min/Max {5}/{6}, Radial Min/Max {7}/{8}"
+					+ "\nInputs: Time = {9}, UT delta = {10}, Acc {11}, Rot {12}, FR {13}"
+					, name, propellantStability, pVertical, pHorizontal, bLevel, ullageHeightMin, ullageHeightMax, ullageRadialMin, ullageRadialMax
+					, deltaTime, utTimeDelta, localAcceleration, rotation, fuelRatio
+				);
 #endif
-
             SetStateString();
         }
         private void SetStateString()
@@ -231,6 +231,7 @@ namespace ModularFuelSystem.Ullage
 
             return propellantStatus;
         }
-
+        
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<UllageSimulator>(true);
     }
 }

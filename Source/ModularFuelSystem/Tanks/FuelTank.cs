@@ -199,12 +199,12 @@ namespace ModularFuelSystem.Tanks
 		{
 			PartResource partResource = resource;
 			// Delete it
-			//Debug.LogWarning ("[MFT] Deleting tank from API " + name);
+			//log.warn ("Deleting tank from API " + name);
 			maxAmountExpression = null;
 
 			part.Resources.Remove (partResource);
 			module.RaiseResourceListChanged ();
-			//print ("Removed.");
+			//log.dbg ("Removed.");
 
 			// Update symmetry counterparts.
 			if (HighLogic.LoadedSceneIsEditor && propagate) {
@@ -214,7 +214,7 @@ namespace ModularFuelSystem.Tanks
 					RaiseResourceListChanged (sym);
 				}
 			}
-			//print ("Sym removed");
+			//log.dbg ("Sym removed");
 		}
 
 		void UpdateTank (double value)
@@ -233,7 +233,7 @@ namespace ModularFuelSystem.Tanks
 				return;
 			}
 
-			//Debug.LogWarning ("[MFT] Updating tank from API " + name + " amount: " + value);
+			//log.warn ("Updating tank from API " + name + " amount: " + value);
 			maxAmountExpression = null;
 
 			// Keep the same fill fraction
@@ -241,7 +241,7 @@ namespace ModularFuelSystem.Tanks
 
 			partResource.maxAmount = value;
 			module.RaiseResourceMaxChanged (partResource, value);
-			//print ("Set new maxAmount");
+			//log.dbg ("Set new maxAmount");
 
 			if (newAmount != partResource.amount) {
 				partResource.amount = newAmount;
@@ -262,22 +262,20 @@ namespace ModularFuelSystem.Tanks
 				}
 			}
 
-			//print ("Symmetry set");
+			//log.dbg ("Symmetry set");
 		}
 
 		void AddTank (double value)
 		{
 			PartResource partResource = resource;
-			//Debug.LogWarning ("[MFT] Adding tank from API " + name + " amount: " + value);
+			//log.warn ("Adding tank from API " + name + " amount: " + value);
 			maxAmountExpression = null;
 
 			ConfigNode node = new ConfigNode ("RESOURCE");
 			node.AddValue ("name", name);
 			node.AddValue ("amount", value);
 			node.AddValue ("maxAmount", value);
-#if DEBUG
-			MonoBehaviour.print (node.ToString ());
-#endif
+			log.dbg("{0}", node);
 			partResource = part.AddResource (node);
 
 			module.RaiseResourceListChanged ();
@@ -307,7 +305,7 @@ namespace ModularFuelSystem.Tanks
 				if (module == null) {
 					throw new InvalidOperationException ("Maxamount is not defined until instantiated in a tank");
 				}
-				//print ("*RK* Setting maxAmount of tank " + name + " of part " + part.name + " to " + value);
+				log.detail("Setting maxAmount of tank {0} of part {1} to {2}", name, part.name, value);
 
 				PartResource partResource = resource;
 				if (partResource != null && value <= 0.0) {
@@ -412,7 +410,7 @@ namespace ModularFuelSystem.Tanks
 			} else if (double.TryParse (maxAmountExpression, out v)) {
 				maxAmount = v;
 			} else {
-				Debug.LogError ("Unable to parse max amount expression: " + maxAmountExpression + " for tank " + name);
+				log.error ("Unable to parse max amount expression: {0} for tank {1]", maxAmountExpression, name);
 				maxAmount = 0;
 				amount = 0;
 				maxAmountExpression = null;
@@ -433,7 +431,7 @@ namespace ModularFuelSystem.Tanks
 				amount = v;
 			} else {
 				amount = maxAmount;
-				Debug.LogError ("Unable to parse amount expression: " + amountExpression + " for tank " + name);
+				log.error ("Unable to parse amount expression: {0} for tank {1]", amountExpression, name);
 			}
 			amountExpression = null;
 		}
@@ -469,5 +467,7 @@ namespace ModularFuelSystem.Tanks
             else
                 density = 0d;
         }
+        
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelTank>(true);
 	}
 }

@@ -52,7 +52,7 @@ namespace ModularFuelSystem.Tanks
 			for (int i = tankList.Count - 1; i >= 0; --i) {
 				var tank = tankList[i];
 				if (!tank.resourceAvailable) {
-					//Debug.LogWarning ("[MFT] Unable to initialize tank definition for resource \"" + tank.name + "\" in tank definition \"" + name + "\" as this resource is not defined.");
+					//log.warn ("Unable to initialize tank definition for resource \"" + tank.name + "\" in tank definition \"" + name + "\" as this resource is not defined.");
 					tankList.RemoveAt (i);
 				}
 			}

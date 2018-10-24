@@ -50,7 +50,7 @@ namespace ModularFuelSystem.Tanks
 
 			foreach (Propellant tfuel in propellants) {
 				if (PartResourceLibrary.Instance.GetDefinition (tfuel.name) == null) {
-					Debug.LogError ("Unknown RESOURCE {" + tfuel.name + "}");
+					log.error ("Unknown RESOURCE [{0}]", tfuel.name);
 					ratioFactor = 0.0;
 					break;
 				}
@@ -67,5 +67,7 @@ namespace ModularFuelSystem.Tanks
 			}
 			names = "Used by: " + title;
 		}
+        
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelInfo>(true);
 	}
 }

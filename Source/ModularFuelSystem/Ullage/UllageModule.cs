@@ -84,11 +84,9 @@ namespace ModularFuelSystem.Ullage
                 str.Append(" is ");
                 str.Append(set.GetUllageStability().ToString("N4"));
                 str.Append("\n");
+	            log.dbg("{0}", str);
 #endif
             }
-#if DEBUG
-            print(str);
-#endif
         }
 
         public void Reset()
@@ -127,5 +125,7 @@ namespace ModularFuelSystem.Ullage
                 }
             }
         }
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<UllageModule>(true);
     }
 }

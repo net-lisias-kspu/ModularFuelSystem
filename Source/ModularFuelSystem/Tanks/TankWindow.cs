@@ -68,7 +68,7 @@ namespace ModularFuelSystem.Tanks
 
 		private void onEditorLoad (ShipConstruct ship, CraftBrowserDialog.LoadType loadType)
 		{
-			Debug.LogFormat ("[TankWindow] onEditorLoad: {0}", loadType);
+			log.info("onEditorLoad: {0}", loadType);
 			for (int i = 0, c = ship.parts.Count; i < c; ++i) {
 				Part part = ship.parts[i];
 				for (int j = 0, d = part.Modules.Count; j < d; ++j) {
@@ -231,7 +231,7 @@ namespace ModularFuelSystem.Tanks
 				myToolTip = GUI.tooltip;
 				counterTT = 0;
 			}
-			//print ("GT: " + GUI.tooltip);
+			//log.dbg ("GT: {0}", GUI.tooltip);
 			GUI.DragWindow ();
         }
 
@@ -273,7 +273,7 @@ namespace ModularFuelSystem.Tanks
 
 				if (trimmed == "") {
 					tank.maxAmount = 0;
-					//Debug.LogWarning ("[MFT] Removing tank as empty input " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
+					//"Removing tank as empty input " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
 				} else {
 					double tmp;
 					if (double.TryParse (trimmed, out tmp)) {
@@ -284,7 +284,7 @@ namespace ModularFuelSystem.Tanks
 
 							// Need to round-trip the value
 							tank.maxAmountExpression = tank.maxAmount.ToString ();
-							//Debug.LogWarning ("[MFT] Updating maxAmount " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
+							//log.warn("Updating maxAmount " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
 						}
 					}
 				}
@@ -296,7 +296,7 @@ namespace ModularFuelSystem.Tanks
 			if (GUILayout.Button ("Remove", GUILayout.Width (58))) {
 				tank.maxAmount = 0;
 				GameEvents.onEditorShipModified.Fire (EditorLogic.fetch.ship);
-				//Debug.LogWarning ("[MFT] Removing tank from button " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
+				//log.warn("Removing tank from button " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
 			}
 		}
 
@@ -307,7 +307,7 @@ namespace ModularFuelSystem.Tanks
 			GUIStyle style = unchanged;
 			if (tank.maxAmountExpression == null) {
 				tank.maxAmountExpression = tank.maxAmount.ToString ();
-				//Debug.LogWarning ("[MFT] Adding tank from API " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
+				//log.warn("Adding tank from API " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
 			} else if (tank.maxAmountExpression.Length > 0 && tank.maxAmountExpression != tank.maxAmount.ToString ()) {
 				style = changed;
 			}
@@ -331,7 +331,7 @@ namespace ModularFuelSystem.Tanks
 				tank.amount = tank.fillable ? tank.maxAmount : 0;
 
 				tank.maxAmountExpression = tank.maxAmount.ToString ();
-				//Debug.LogWarning ("[MFT] Adding tank " + tank.name + " maxAmount: " + tank.maxAmountExpression ?? "null");
+				//log.warn("Adding tank " + tank.name + " maxAmount: " + tank.maxAmountExpression ?? "null");
 			}
 		}
 
@@ -404,5 +404,7 @@ namespace ModularFuelSystem.Tanks
 				}
 			}
         }
+        
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<TankWindow>(true);
     }
 }

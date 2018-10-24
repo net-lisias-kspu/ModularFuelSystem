@@ -215,10 +215,11 @@ namespace ModularFuelSystem
             float factorRelative = data.Get<float>("factorRelative");
             scale = factorAbsolute * factorAbsolute; // quadratic
             SetConfiguration();
-            /*Debug.Log("PartMessage: OnPartScaleChanged:"
-                + "\npart=" + part.name
-                + "\nfactorRelative=" + factorRelative.ToString()
-                + "\nfactorAbsolute=" + factorAbsolute.ToString());*/
+            log.detail("PartMessage: OnPartScaleChanged:"
+                + "\npart={0}"
+                + "\nfactorRelative={1}"
+                + "\nfactorAbsolute={2}"
+                , part.name, factorRelative, factorAbsolute);
         }
         #endregion
 
@@ -288,7 +289,7 @@ namespace ModularFuelSystem
                 configs.Clear();
 
                 foreach (ConfigNode subNode in cNodes) {
-                    //Debug.Log("*RFMEC* Load Engine Configs. Part " + part.name + " has config " + subNode.GetValue("name"));
+                    log.detail("Load Engine Configs. Part {0} has config {1}", part.name, subNode.GetValue("name"));
                     ConfigNode newNode = new ConfigNode("CONFIG");
                     subNode.CopyTo(newNode);
                     configs.Add(newNode);
@@ -619,10 +620,7 @@ namespace ModularFuelSystem
                 newConfig.CopyTo(config);
                 config.name = "MODULE";
 
-#if DEBUG
-                print ("replacing " + type + " with:");
-                print (newConfig.ToString ());
-#endif
+                log.dbg("replacing {0} with: ", type, newConfig);
 
                 pModule = null;
                 // get correct module
@@ -630,7 +628,7 @@ namespace ModularFuelSystem
 
                 if ((object)pModule == null)
                 {
-                    Debug.LogError("*RFMEC* Could not find appropriate module of type " + type + ", with ID=" + engineID + " and index " + moduleIndex);
+                    log.error("Could not find appropriate module of type {0}, with ID={1} and index {2}", type, engineID, moduleIndex);
                     return;
                 }
 
@@ -669,7 +667,7 @@ namespace ModularFuelSystem
                             }
                             catch (Exception e)
                             {
-                                Debug.LogError("*RFMEC* Trying to remove info box: " + e.Message);
+                                log.error(e, "Trying to remove info box");
                             }
                         }
                         boxes.Clear();
@@ -831,7 +829,7 @@ namespace ModularFuelSystem
             }
             else
             {
-                Debug.LogError("*RFMEC* ERROR could not find configuration of name " + configuration + " and could find no fallback config.\nFor part " + part.name + ", Current nodes:" + Utilities.PrintConfigs(configs));
+                log.error("could not find configuration of name {0} and could find no fallback config.\nFor part {1}, Current nodes: {2}", configuration, part.name, Utilities.PrintConfigs(configs));
             }
 
             StopFX();
@@ -1567,7 +1565,7 @@ namespace ModularFuelSystem
         {
             string partName = Utilities.GetPartName(part);
             partName += moduleIndex + engineID;
-            //Debug.Log("*RFMEC* Saveload " + partName);
+            log.detail("Saveload {0}", partName);
             if (configs == null)
                 configs = new List<ConfigNode>();
             if (configs.Count > 0)
@@ -1575,28 +1573,27 @@ namespace ModularFuelSystem
                 if (!RFSettings.Instance.engineConfigs.ContainsKey(partName))
                 {
                     RFSettings.Instance.engineConfigs[partName] = new List<ConfigNode>(configs);
-                    /*Debug.Log("*RFMEC* Saved " + configs.Count + " configs");
-                    Debug.Log("Current nodes:" + Utilities.PrintConfigs(configs));*/
+                    log.detail("Saved {0} configs", configs.Count);
+                    log.detail("Current nodes: {0}", Utilities.PrintConfigs(configs));
                 }
                 else
                 {
-                    /*Debug.Log("*RFMEC* ERROR: part " + partName + " already in database! Current count = " + configs.Count + ", db count = " + RFSettings.Instance.engineConfigs[partName].Count);
-                    Debug.Log("DB nodes:" + Utilities.PrintConfigs(RFSettings.Instance.engineConfigs[partName]));
-                    Debug.Log("Current nodes:" + Utilities.PrintConfigs(configs));*/
+					log.error("part {0} already in database! Current count = {1}, db count = {2}", partName, configs.Count, RFSettings.Instance.engineConfigs[partName].Count);
+                    log.detail("DB nodes: {0}", Utilities.PrintConfigs(RFSettings.Instance.engineConfigs[partName]));
+                    log.detail("Current nodes: {0}", Utilities.PrintConfigs(configs));
                     //configs = RFSettings.Instance.engineConfigs[partName]; // just in case.
                 }
-
             }
             else
             {
                 if (RFSettings.Instance.engineConfigs.ContainsKey(partName))
                 {
                     configs = new List<ConfigNode>(RFSettings.Instance.engineConfigs[partName]);
-                    /*Debug.Log("Found " + configs.Count + " configs!");
-                    Debug.Log("Current nodes:" + Utilities.PrintConfigs(configs));*/
+                    log.detail("Found {0} configs!", configs.Count);
+                    log.detail("Current nodes: {0}", Utilities.PrintConfigs(configs));
                 }
                 else
-                    Debug.Log("*RFMEC* ERROR: could not find configs definition for " + partName);
+                    log.info("could not find configs definition for {0}", partName);
             }
         }
 
@@ -1648,5 +1645,7 @@ namespace ModularFuelSystem
             return null;
         }
         #endregion
+
+		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<ModuleHybridEngine>(true);
     }
 }
