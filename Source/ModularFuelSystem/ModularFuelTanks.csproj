@@ -36,9 +36,6 @@
     <Compile Include="assembly\Checkers.cs">
       <Link>Properties\Checkers.cs</Link>
     </Compile>
-    <Compile Include="assembly\AssemblyInfoMFT.cs">
-      <Link>Properties\AssemblyInfoMFT.cs</Link>
-    </Compile>
     <Compile Include="assembly\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>
@@ -66,6 +63,12 @@
     <Compile Include="Pumps\RefuelingPump.cs" />
     <Compile Include="Utilities\Styles.cs" />
     <Compile Include="EditorToolbar.cs" />
+    <Compile Include="Properties\VersionMFT.cs">
+      <DependentUpon>VersionMFT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="assembly\AssemblyInfoMFT.cs">
+      <Link>Properties\AssemblyInfoMFT.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -77,6 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\VersionMFT.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VersionMFT.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent></PreBuildEvent>
