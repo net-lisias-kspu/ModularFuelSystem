@@ -85,42 +85,21 @@ namespace ModularFuelSystem.TechLevels
             else
                 velocityCurve = null;
 
-            if (node.HasValue("TWR"))
-                TWR = double.Parse(node.GetValue("TWR"));
-            else
-                TWR = -1;
+			TWR = node.HasValue("TWR") ? double.Parse(node.GetValue("TWR")) : -1;
 
-            if (node.HasValue("thrustMultiplier"))
-                thrustMultiplier = double.Parse(node.GetValue("thrustMultiplier"));
-            else
-                thrustMultiplier = -1;
+			thrustMultiplier = node.HasValue("thrustMultiplier") ? double.Parse(node.GetValue("thrustMultiplier")) : -1;
 
-            if (node.HasValue("massMultiplier"))
-                massMultiplier = double.Parse(node.GetValue("massMultiplier"));
-            else
-                massMultiplier = -1;
+			massMultiplier = node.HasValue("massMultiplier") ? double.Parse(node.GetValue("massMultiplier")) : -1;
 
-            if (node.HasValue("minThrottleMultiplier"))
-                minThrottleMultiplier = double.Parse(node.GetValue("minThrottleMultiplier"));
-            else
-                minThrottleMultiplier = -1;
+			minThrottleMultiplier = node.HasValue("minThrottleMultiplier") ? double.Parse(node.GetValue("minThrottleMultiplier")) : -1;
 
-            if (node.HasValue("gimbalRange"))
-                gimbalRange = float.Parse(node.GetValue("gimbalRange"));
-            else
-                gimbalRange = -1;
+			gimbalRange = node.HasValue("gimbalRange") ? float.Parse(node.GetValue("gimbalRange")) : -1;
 
-            if (node.HasValue("costMult"))
-                costMult = float.Parse(node.GetValue("costMult"));
-            else
-                costMult = 1f;
+			costMult = node.HasValue("costMult") ? float.Parse(node.GetValue("costMult")) : 1f;
 
-            if (node.HasValue("techRequired"))
-                techRequired = node.GetValue("techRequired");
-            else
-                techRequired = "";
+			techRequired = node.HasValue("techRequired") ? node.GetValue("techRequired") : "";
 
-            return true;
+			return true;
         }
 
         // loads a given techlevel from global techlevels-style node
@@ -151,32 +130,17 @@ namespace ModularFuelSystem.TechLevels
             else
                 velocityCurve = null;
 
-            if (node.HasValue("TLTWR" + level))
-                TWR = double.Parse(node.GetValue("TLTWR" + level));
-            else
-                TWR = 60;
+			TWR = node.HasValue("TLTWR" + level) ? double.Parse(node.GetValue("TLTWR" + level)) : 60;
 
-            if (node.HasValue("TLTHROTTLE" + level))
-                minThrottleMultiplier = double.Parse(node.GetValue("TLTHROTTLE" + level));
-            else
-                minThrottleMultiplier = 0.0;
+			minThrottleMultiplier = node.HasValue("TLTHROTTLE" + level) ? double.Parse(node.GetValue("TLTHROTTLE" + level)) : 0.0;
 
-            if (node.HasValue("TLGIMBAL" + level))
-                gimbalRange = float.Parse(node.GetValue("TLGIMBAL" + level));
-            else
-                gimbalRange = -1;
+			gimbalRange = node.HasValue("TLGIMBAL" + level) ? float.Parse(node.GetValue("TLGIMBAL" + level)) : -1;
 
-            if (node.HasValue("TLCOST" + level))
-                costMult = float.Parse(node.GetValue("TLCOST" + level));
-            else
-                costMult = 1;
+			costMult = node.HasValue("TLCOST" + level) ? float.Parse(node.GetValue("TLCOST" + level)) : 1;
 
-            if (node.HasValue("TLTECH" + level))
-                techRequired = node.GetValue("TLTECH" + level);
-            else
-                techRequired = "";
+			techRequired = node.HasValue("TLTECH" + level) ? node.GetValue("TLTECH" + level) : "";
 
-            return true;
+			return true;
         }
 
         // loads from global techlevels
@@ -232,36 +196,35 @@ namespace ModularFuelSystem.TechLevels
         // MULTIPLIERS
         public double Thrust(TechLevel oldTL, bool constantMass = false)
         {
-            if (oldTL.thrustMultiplier > 0 && thrustMultiplier > 0)
-                return thrustMultiplier / oldTL.thrustMultiplier;
+			return 
+				oldTL.thrustMultiplier > 0 && thrustMultiplier > 0
+					? thrustMultiplier / oldTL.thrustMultiplier
+				: constantMass
+					? TWR / oldTL.TWR
+				: TWR / oldTL.TWR * oldTL.atmosphereCurve.Evaluate(0) / atmosphereCurve.Evaluate(0);
+		}
 
-            if (constantMass)
-                return TWR / oldTL.TWR;
-            else
-                return TWR / oldTL.TWR * oldTL.atmosphereCurve.Evaluate(0) / atmosphereCurve.Evaluate(0);
-        }
-
-        public double Mass(TechLevel oldTL, bool constantThrust = false)
+		public double Mass(TechLevel oldTL, bool constantThrust = false)
         {
-            if (oldTL.massMultiplier > 0 && massMultiplier > 0)
-                return massMultiplier / oldTL.massMultiplier;
+			return
+				oldTL.massMultiplier > 0 && massMultiplier > 0
+					? massMultiplier / oldTL.massMultiplier
+				: constantThrust 
+					? oldTL.TWR / TWR 
+				: oldTL.atmosphereCurve.Evaluate(0) / atmosphereCurve.Evaluate(0);
+		}
 
-            if (constantThrust)
-                return oldTL.TWR / TWR;
-            else
-                return oldTL.atmosphereCurve.Evaluate(0) / atmosphereCurve.Evaluate(0);
-        }
-
-        public double Throttle()
+		public double Throttle()
         {
-            if (minThrottleMultiplier < 0)
-                return 0.0;
-            if (minThrottleMultiplier > 1.0)
-                return 1.0;
-            return minThrottleMultiplier;
-        }
+			return 
+				minThrottleMultiplier < 0 
+					? 0.0
+				: minThrottleMultiplier > 1.0 
+					? 1.0
+				: minThrottleMultiplier;
+		}
 
-        public float GimbalRange
+		public float GimbalRange
         {
             get
             {
@@ -384,27 +347,27 @@ namespace ModularFuelSystem.TechLevels
         // full check
         public static int MaxTL(ConfigNode cfg, ConfigNode mod, string type)
         {
-            if (cfg.GetNodes("TECHLEVEL").Count() > 0)
-                return MaxTL(cfg, type);
-            else if (cfg.HasValue("techLevelType"))
-                return MaxTL(cfg.GetValue("techLevelType"));
-            else
-                return MaxTL(mod, type);
-        }
+			return 
+				cfg.GetNodes("TECHLEVEL").Any()
+					? MaxTL(cfg, type)
+				: cfg.HasValue("techLevelType")
+					? MaxTL(cfg.GetValue("techLevelType"))
+				: MaxTL(mod, type);
+		}
 
-        // full check
-        public static int MinTL(ConfigNode cfg, ConfigNode mod, string type)
+		// full check
+		public static int MinTL(ConfigNode cfg, ConfigNode mod, string type)
         {
-            if (cfg.GetNodes("TECHLEVEL").Count() > 0)
-                return MinTL(cfg, type);
-            else if (cfg.HasValue("techLevelType"))
-                return MinTL(cfg.GetValue("techLevelType"));
-            else
-                return MinTL(mod, type);
-        }
+			return
+				cfg.GetNodes("TECHLEVEL").Any()
+					? MinTL(cfg, type)
+				: cfg.HasValue("techLevelType")
+					? MinTL(cfg.GetValue("techLevelType"))
+				: MinTL(mod, type);
+		}
 
-        // Check if can switch to TL
-        public static bool CanTL(ConfigNode cfg, ConfigNode mod, string type, int level)
+		// Check if can switch to TL
+		public static bool CanTL(ConfigNode cfg, ConfigNode mod, string type, int level)
         {
             TechLevel nTL = new TechLevel();
             if (!nTL.Load(cfg, mod, type, level))
