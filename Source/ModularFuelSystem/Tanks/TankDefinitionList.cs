@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine;
 
-namespace RealFuels.Tanks
+namespace ModularFuelSystem.Tanks
 {
 	public class TankDefinitionList : KeyedCollection<string, TankDefinition>, IConfigNode
 	{

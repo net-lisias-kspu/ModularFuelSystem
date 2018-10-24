@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace RealFuels.Ullage
+namespace ModularFuelSystem.Ullage
 {
     public class UllageSet : IConfigNode
     {

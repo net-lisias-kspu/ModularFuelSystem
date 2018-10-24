@@ -1,4 +1,4 @@
-//#define DEBUG
+﻿//#define DEBUG
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Reflection;
 using UnityEngine;
 using KSP;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     public class RefuelingPump : PartModule, IAnalyticPreview
     {

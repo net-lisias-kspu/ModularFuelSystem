@@ -6,7 +6,7 @@ using UnityEngine;
 using KSP;
 using SolverEngines;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     public class ModuleEnginesRF : ModuleEnginesSolver
     {

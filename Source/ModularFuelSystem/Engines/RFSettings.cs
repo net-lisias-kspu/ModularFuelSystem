@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     // ReSharper disable once InconsistentNaming
     public class RFSettings : MonoBehaviour

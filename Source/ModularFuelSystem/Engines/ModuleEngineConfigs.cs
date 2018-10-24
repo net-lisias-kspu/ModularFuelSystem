@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -6,11 +6,11 @@ using System.Linq;
 using UnityEngine;
 using KSP;
 using Debug = UnityEngine.Debug;
-using RealFuels.TechLevels;
+using ModularFuelSystem.TechLevels;
 using SolverEngines;
 using KSP.UI.Screens;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     public class ModuleHybridEngine : ModuleEngineConfigs
     {

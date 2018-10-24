@@ -1,13 +1,13 @@
 ﻿using TweakScale;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
-    public class TweakScaleModularFuelTanksUpdater : IRescalable<RealFuels.Tanks.ModuleFuelTanks>
+    public class TweakScaleModularFuelTanksUpdater : IRescalable<ModularFuelSystem.Tanks.ModuleFuelTanks>
     {
-		private RealFuels.Tanks.ModuleFuelTanks Module { get; }
+		private ModularFuelSystem.Tanks.ModuleFuelTanks Module { get; }
 		private Part Part => Module.part;
 
-		public TweakScaleModularFuelTanksUpdater(RealFuels.Tanks.ModuleFuelTanks pm)
+		public TweakScaleModularFuelTanksUpdater(ModularFuelSystem.Tanks.ModuleFuelTanks pm)
         {
 			Module = pm;
         }

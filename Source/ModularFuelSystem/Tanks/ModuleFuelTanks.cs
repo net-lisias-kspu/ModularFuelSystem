@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
@@ -12,7 +12,7 @@ using KSP.UI.Screens;
 
 // ReSharper disable InconsistentNaming, CompareOfFloatsByEqualityOperator
 
-namespace RealFuels.Tanks
+namespace ModularFuelSystem.Tanks
 {
     public partial class ModuleFuelTanks : PartModule, IModuleInfo, IPartCostModifier, IPartMassModifier
 	{

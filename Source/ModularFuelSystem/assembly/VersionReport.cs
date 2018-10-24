@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using UnityEngine;
 using System.Reflection;
 
 using KSP.IO;
 
-namespace RealFuels {
+namespace ModularFuelSystem {
 
 	[KSPAddon(KSPAddon.Startup.Instantly, true)]
 	public class MFSVersionReport : MonoBehaviour

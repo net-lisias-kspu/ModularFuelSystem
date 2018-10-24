@@ -2,7 +2,7 @@
 using System.Linq;
 using TweakScale;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     class TweakScaleModularEnginesUpdater : IRescalable<ModuleEngineConfigs>
     {

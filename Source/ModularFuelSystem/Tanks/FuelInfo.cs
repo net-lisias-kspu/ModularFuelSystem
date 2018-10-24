@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 // ReSharper disable InconsistentNaming, CompareOfFloatsByEqualityOperator
 
-namespace RealFuels.Tanks
+namespace ModularFuelSystem.Tanks
 {
 	internal class FuelInfo
 	{

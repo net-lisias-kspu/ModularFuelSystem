@@ -8,7 +8,7 @@ using System.IO;
 using KSP;
 using UnityEngine;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     internal class Styles
     {

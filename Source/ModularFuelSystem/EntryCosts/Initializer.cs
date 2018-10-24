@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class EntryCostInitializer : MonoBehaviour

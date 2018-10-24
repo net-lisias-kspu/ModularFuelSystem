@@ -5,7 +5,7 @@ using System.Text;
 
 using UnityEngine;
 
-namespace RealFuels.TechLevels
+namespace ModularFuelSystem.TechLevels
 {
     public class TechLevel
     {

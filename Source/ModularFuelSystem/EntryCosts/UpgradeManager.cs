@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.EDITOR, GameScenes.SPACECENTER })]
     public class EntryCostManager : ScenarioModule

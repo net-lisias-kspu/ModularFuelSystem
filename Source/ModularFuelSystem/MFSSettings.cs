@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
 	[KSPAddon (KSPAddon.Startup.Instantly, false)]
     public class MFSSettings : MonoBehaviour

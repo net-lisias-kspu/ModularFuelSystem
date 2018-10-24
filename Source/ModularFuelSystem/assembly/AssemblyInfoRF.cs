@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
 // Information about this assembly is defined by the following attributes.
@@ -17,9 +17,9 @@ using System.Runtime.CompilerServices;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion(RealFuels.Version.Number)]
-[assembly: AssemblyInformationalVersionAttribute(RealFuels.Version.Number)]
-[assembly: AssemblyFileVersion(RealFuels.Version.Number)]
+[assembly: AssemblyVersion(ModularFuelSystem.Version.Number)]
+[assembly: AssemblyInformationalVersionAttribute(ModularFuelSystem.Version.Number)]
+[assembly: AssemblyFileVersion(ModularFuelSystem.Version.Number)]
 
 // The following attributes are used to specify the signing key for the assembly,
 // if desired. See the Mono documentation for more information about signing.
@@ -27,5 +27,5 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
-[assembly: KSPAssembly("RealFuels", RealFuels.Version.major, RealFuels.Version.minor)]
+[assembly: KSPAssembly("RealFuels", ModularFuelSystem.Version.major, ModularFuelSystem.Version.minor)]
 [assembly: KSPAssemblyDependency("SolverEngines", 3, 3)]

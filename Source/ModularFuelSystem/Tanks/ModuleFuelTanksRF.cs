@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RealFuels.Tanks
+namespace ModularFuelSystem.Tanks
 {
     public partial class ModuleFuelTanks : IAnalyticTemperatureModifier, IAnalyticPreview
     {
@@ -383,8 +383,8 @@ namespace RealFuels.Tanks
                             // subtract heat from boiloff
                             // subtracting heat in analytic mode is tricky: Analytic flux handling is 'cheaty' and tricky to predict. 
                             // scratch sheet: example
-                            // [RealFuels.ModuleFuelTankRF] proceduralTankRealFuels Analytic Temp = 256.679360297684, Analytic Internal = 256.679360297684, Analytic Skin = 256.679360297684
-                            // [RealFuels.ModuleFuelTankRF] proceduralTankRealFuels deltaTime = 17306955.5092776, heat lost = 6638604.21227684, thermalMassReciprocal = 0.00444787360733243
+                            // [ModularFuelSystem.ModuleFuelTankRF] proceduralTankRealFuels Analytic Temp = 256.679360297684, Analytic Internal = 256.679360297684, Analytic Skin = 256.679360297684
+                            // [ModularFuelSystem.ModuleFuelTankRF] proceduralTankRealFuels deltaTime = 17306955.5092776, heat lost = 6638604.21227684, thermalMassReciprocal = 0.00444787360733243
 
                             if (!double.IsNaN(Q))
                             {
@@ -505,8 +505,8 @@ namespace RealFuels.Tanks
                 totalTankArea += part.DragCubes.WeightedArea[i];
             }
 #if DEBUG
-            Debug.Log("[RealFuels.ModuleFuelTankRF] Part WeightedArea: " + part.name + " = " + totalTankArea.ToString("F2"));
-            Debug.Log("[RealFuels.ModuleFuelTankRF] Part Area: " + part.name + " = " + part.DragCubes.Area.ToString("F2"));
+            Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] Part WeightedArea: " + part.name + " = " + totalTankArea.ToString("F2"));
+            Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] Part Area: " + part.name + " = " + part.DragCubes.Area.ToString("F2"));
 #endif
             // This allows a rough guess as to individual tank surface area based on ratio of tank volume to total volume but it breaks down at very small fractions
             // So use greater of spherical calculation and tank ratio of total area.
@@ -531,10 +531,10 @@ namespace RealFuels.Tanks
 
                     if (RFSettings.Instance.debugBoilOff)
                     {
-                        Debug.Log("[RealFuels.ModuleFuelTankRF] " + tank.name + ".tankRatio = " + tank.tankRatio.ToString());
-                        Debug.Log("[RealFuels.ModuleFuelTankRF] " + tank.name + ".maxAmount = " + tankMaxAmount.ToString());
-                        Debug.Log("[RealFuels.ModuleFuelTankRF] " + part.name + ".totalTankArea = " + totalTankArea.ToString());
-                        Debug.Log("[RealFuels.ModuleFuelTankRF] Tank surface area = " + tank.totalArea.ToString());
+                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + tank.name + ".tankRatio = " + tank.tankRatio.ToString());
+                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + tank.name + ".maxAmount = " + tankMaxAmount.ToString());
+                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + part.name + ".totalTankArea = " + totalTankArea.ToString());
+                        Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] Tank surface area = " + tank.totalArea.ToString());
                         DebugLog("tank Dewar status = " + tank.isDewar.ToString());
                     }
                 }
@@ -648,12 +648,12 @@ namespace RealFuels.Tanks
 
         static void print(string msg)
         {
-            MonoBehaviour.print("[RealFuels.ModuleFuelTankRF] " + msg);
+            MonoBehaviour.print("[ModularFuelSystem.ModuleFuelTankRF] " + msg);
         }
 
         static void DebugLog(string msg)
         {
-            Debug.Log("[RealFuels.ModuleFuelTankRF] " + msg);
+            Debug.Log("[ModularFuelSystem.ModuleFuelTankRF] " + msg);
         }
 
         #region Cryogenics

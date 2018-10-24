@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using KSP.UI.Screens;
 
 // ReSharper disable InconsistentNaming, CompareOfFloatsByEqualityOperator
 
-namespace RealFuels.Tanks
+namespace ModularFuelSystem.Tanks
 {
 	[KSPAddon (KSPAddon.Startup.EditorAny, false)]
     public class TankWindow : MonoBehaviour

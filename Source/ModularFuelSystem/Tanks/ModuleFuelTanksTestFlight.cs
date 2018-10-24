@@ -1,4 +1,4 @@
-﻿namespace RealFuels.Tanks
+﻿namespace ModularFuelSystem.Tanks
 {
     public partial class ModuleFuelTanks
     {

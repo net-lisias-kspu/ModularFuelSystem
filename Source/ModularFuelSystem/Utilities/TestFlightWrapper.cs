@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace RealFuels
+namespace ModularFuelSystem
 {
     public static class TestFlightWrapper
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RealFuels.Tanks
+namespace ModularFuelSystem.Tanks
 {
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class EditorCrossfeedSetMaintainer : MonoBehaviour

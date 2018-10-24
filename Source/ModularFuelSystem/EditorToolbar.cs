@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -7,7 +7,7 @@ using RUI.Icons.Selectable;
 
 using KSP.UI.Screens;
 
-namespace RealFuels {
+namespace ModularFuelSystem {
 
 	[KSPAddon (KSPAddon.Startup.EditorAny, false) ]
 	public class MFTEditorToolbar : MonoBehaviour
