@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#TODO: Cook a way to handle both derivatives! Right now, manual intervention to delete alien artifacts is needed.
 source ./CONFIG.inc
 
 clean() {
