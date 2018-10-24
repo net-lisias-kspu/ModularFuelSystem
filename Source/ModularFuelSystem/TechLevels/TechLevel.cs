@@ -106,7 +106,7 @@ namespace ModularFuelSystem.TechLevels
         public bool Load(ConfigNode node, int level)
         {
 			ConfigNode[] tLs = node.GetNodes("TECHLEVEL");
-            if (tLs.Count() > 0)
+            if (tLs.Any())
             {
                 foreach (ConfigNode n in tLs)
                     if (n.HasValue("name") && n.GetValue("name").Trim().Equals(level.ToString()))
@@ -164,7 +164,7 @@ namespace ModularFuelSystem.TechLevels
             if (cfg != null)
             {
 				ConfigNode[] tLs = cfg.GetNodes("TECHLEVEL");
-                if (tLs.Count() > 0)
+                if (tLs.Any())
                 {
                     foreach (ConfigNode n in tLs)
                         if (n.HasValue("name") && n.GetValue("name").Equals(level.ToString()))
@@ -179,7 +179,7 @@ namespace ModularFuelSystem.TechLevels
             if (mod != null)
             {
 				ConfigNode[] tLs = mod.GetNodes("TECHLEVEL");
-                if (tLs.Count() > 0)
+                if (tLs.Any())
                 {
                     foreach (ConfigNode n in tLs)
                         if (n.HasValue("name") && n.GetValue("name").Equals(level.ToString()))
@@ -259,7 +259,7 @@ namespace ModularFuelSystem.TechLevels
                 if (node.HasValue("name") && node.GetValue("name").Equals(type))
                 {
 					ConfigNode[] tLs = node.GetNodes("TECHLEVEL");
-                    if (tLs.Count() > 0)
+                    if (tLs.Any())
                     {
                         return MaxTL(node);
                     }
@@ -288,7 +288,7 @@ namespace ModularFuelSystem.TechLevels
                 if (node.HasValue("name") && node.GetValue("name").Equals(type))
                 {
 					ConfigNode[] tLs = node.GetNodes("TECHLEVEL");
-                    if (tLs.Count() > 0)
+                    if (tLs.Any())
                     {
                         return MinTL(node);
                     }
