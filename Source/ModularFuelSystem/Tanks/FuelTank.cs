@@ -203,7 +203,9 @@ namespace ModularFuelSystem.Tanks
 			maxAmountExpression = null;
 
 			part.Resources.Remove (partResource);
+#if KSP145
 			part.SimulationResources.Remove (partResource);
+#endif
 			module.RaiseResourceListChanged ();
 			//log.dbg ("Removed.");
 
@@ -212,7 +214,9 @@ namespace ModularFuelSystem.Tanks
 				foreach (Part sym in part.symmetryCounterparts) {
 					PartResource symResc = sym.Resources[name];
 					sym.Resources.Remove (symResc);
+#if KSP145
 					sym.SimulationResources.Remove (symResc);
+#endif
 					RaiseResourceListChanged (sym);
 				}
 			}
