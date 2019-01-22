@@ -42,7 +42,7 @@ deploy() {
 	check
 	cp $VERSIONFILE "./GameData/$TARGETDIR"
 	cp CHANGE_LOG.md "./GameData/$TARGETDIR"
-	cp *LICENSE "./GameData/$TARGETDIR"
+	cp LICENSE* "./GameData/$TARGETDIR"
 	cp NOTICE "./GameData/$TARGETDIR"
 	deploy_md README.md
 

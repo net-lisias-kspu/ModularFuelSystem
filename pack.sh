@@ -13,6 +13,7 @@ pack() {
     echo $FILE
     zip -r $FILE ./GameData/$PACKAGE/* -x ".*"
     zip -r $FILE ./PluginData/* -x ".*"
+    zip $FILE ./INSTALL.md
     zip -d $FILE __MACOSX "**/.DS_Store"
     mv $FILE ./Archive
 }
