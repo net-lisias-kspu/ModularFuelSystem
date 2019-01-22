@@ -40,16 +40,16 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Scale_Redist">
-      <HintPath>..\..\..\..\..\LIB\plugins\Scale_Redist.dll</HintPath>
-    </Reference>
-    <Reference Include="SolverEngines">
-      <HintPath>..\..\..\..\..\LIB\plugins\SolverEngines.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Scale_Redist">
+      <HintPath>..\..\..\..\..\..\LIB\plugins\Scale_Redist.dll</HintPath>
+    </Reference>
+    <Reference Include="SolverEngines">
+      <HintPath>..\..\..\..\..\..\LIB\plugins\SolverEngines.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
