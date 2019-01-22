@@ -12,11 +12,13 @@ Unofficial fork by Lisias.
 ## In a Hurry
 
 * [Latest Release](https://github.com/net-lisias-kspu/ModularFuelSystem/releases)
-	+ [Binaries](https://github.com/net-lisias-kspu/ModularFuelSystem/tree/Archive)
+        + [Binaries](https://github.com/net-lisias-kspu/ModularFuelSystem/tree/Archive)
 * [Source](https://github.com/net-lisias-kspu/ModularFuelSystem)
-* [Project's README](https://github.com/net-lisias-kspu/ModularFuelSystem/blob/master/README.md)
-* [Change Log](./CHANGE_LOG.md)
-* [TODO](./TODO.md) list
+* Documentation
+        + [Project's README](https://github.com/net-lisias-kspu/ModularFuelSystem/blob/master/README.md)
+        + [Install Instructions](https://github.com/net-lisias-kspu/ModularFuelSystem/blob/master/INSTALL.md)
+        + [Change Log](./CHANGE_LOG.md)
+        + [TODO](./TODO.md) list
 
 
 ## Description
@@ -38,32 +40,7 @@ Please refer to the original [readme](https://github.com/net-lisias-kspu/Modular
 
 ## Installation
 
-To install, place the GameData folder inside your Kerbal Space Program folder.
-
-**REMOVE ANY OLD VERSIONS OF THE PRODUCT BEFORE INSTALLING**.
-
-***Important***: Only one of these two packages can be installed on your installment at a given time. **DO NOT INSTALL BOTH**.
-
-### Dependencies
-
-No dependencies are included. Please refer to the links below to fulfill them.
-
-#### All
-
-* Hard Dependencies
-	+ [KSPe](https://github.com/net-lisias-ksp/KSPAPIExtensions)
-* Soft Dependencies
-	+ [Module Manager](https://github.com/net-lisias-ksp/ModuleManager)
-
-#### Real Fuels
-
-Real Fuels also needs:
-
-* Hard Dependencies
-	+ [Solver Engines](https://github.com/net-lisias-kspu/SolverEngines)
-* Soft Dependencies
-	+ [Community Resource Pack](https://forum.kerbalspaceprogram.com/index.php?/topic/83007-community-resource-pack/)
-
+Detailed installation instructions are now on its own file (see the [In a Hurry](#in-a-hurry) section) and on the distribution file.
 
 ### Licensing
 
