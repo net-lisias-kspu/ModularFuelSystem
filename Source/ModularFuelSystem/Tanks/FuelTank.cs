@@ -141,7 +141,9 @@ namespace ModularFuelSystem.Tanks
 
 		public void RaiseResourceListChanged (Part part)
 		{
+#if KSP150
 			part.ResetSimulationResources ();
+#endif
 			part.SendEvent ("OnResourceListChanged", null, 0);
 		}
 
@@ -220,7 +222,9 @@ namespace ModularFuelSystem.Tanks
             {
                 // there are no unmanaged resources of this type so, business as usual
                 part.Resources.Remove(partResource);
+#if KSP150
                 part.SimulationResources.Remove(partResource);
+#endif
             }
             else if (part.Resources.Contains(partResource.resourceName))
             {
@@ -249,7 +253,9 @@ namespace ModularFuelSystem.Tanks
                     {
                         PartResource symResc = sym.Resources[name];
                         sym.Resources.Remove(symResc);
+#if KSP150
                         sym.SimulationResources.Remove(symResc);
+#endif
                     }
                     else if (part.Resources.Contains(partResource.resourceName))
                     {

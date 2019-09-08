@@ -34,6 +34,17 @@ using UnityEngine;
 \*-----------------------------------------*/
 namespace ModularFuelSystem
 {
+	internal class DEF
+	{
+		internal static readonly int KSP_MAJOR = 1;
+		internal static readonly int KSP_MINOR =
+#if KSP150
+			5
+#else
+			4
+#endif
+			;
+	}
 
     /**
      * This utility displays a warning with a list of mods that determine themselves
@@ -64,8 +75,8 @@ namespace ModularFuelSystem
             // Even if you don't lock down functionality, you should return true if your users
             // can expect a future update to be available.
             //
-			if (Versioning.version_major != 1
-				|| Versioning.version_minor < 6) {
+			if (Versioning.version_major != DEF.KSP_MAJOR
+				|| Versioning.version_minor < DEF.KSP_MAJOR) {
 				return false;
 			}
 

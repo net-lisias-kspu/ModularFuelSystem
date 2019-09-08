@@ -147,7 +147,9 @@ namespace ModularFuelSystem.Tanks
 				if (!tankList.Contains (partResource.resourceName))
 					continue;
 				part.Resources.Remove(partResource.info.id);
+#if KSP150
 				part.SimulationResources.Remove(partResource.info.id);
+#endif
 			}
 			RaiseResourceListChanged ();
 			// Setup the mass
@@ -282,7 +284,9 @@ namespace ModularFuelSystem.Tanks
                         if (!tankList.Contains(partResource.resourceName) && !unmanagedResources.ContainsKey(partResource.resourceName))
                         {
                             part.Resources.Remove(partResource.info.id);
+#if KSP150
                             part.SimulationResources.Remove(partResource.info.id);
+#endif
                         }
                     }
                     RaiseResourceListChanged();
@@ -623,7 +627,7 @@ namespace ModularFuelSystem.Tanks
 				if (!managed.Contains(resname) || tankList.Contains(resname) || unmanagedResources.ContainsKey(resname))
 					continue;
 				part.Resources.Remove (partResource.info.id);
-#if KSP145
+#if KSP150
 				part.SimulationResources.Remove (partResource.info.id);
 #endif
 				needsMesage = true;
@@ -1002,7 +1006,9 @@ namespace ModularFuelSystem.Tanks
 		public void RaiseResourceListChanged ()
 		{
 			GameEvents.onPartResourceListChange.Fire (part);
+#if KSP150
 			part.ResetSimulationResources ();
+#endif
 			part.SendEvent ("OnResourceListChanged", null, 0);
 			MarkWindowDirty();
 		}
