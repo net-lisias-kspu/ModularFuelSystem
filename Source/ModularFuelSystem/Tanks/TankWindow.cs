@@ -39,6 +39,10 @@ namespace ModularFuelSystem.Tanks
 		bool ActionGroupMode;
 		ModuleFuelTanks tank_module;
 
+		Dictionary<string, string> addLabelCache = new Dictionary<string, string>();
+		double oldAvailableVolume = 0;
+		string oldTankType = "newnewnew"; //force refresh on first call to EnsureFreshAddLabelCache()
+
 		public static void HideGUI ()
 		{
 			if (instance != null) {
@@ -64,6 +68,20 @@ namespace ModularFuelSystem.Tanks
             EditorLogic editor = EditorLogic.fetch;
             if(!enabled &&  editor != null)
                 editor.Unlock("MFTGUILock");
+		}
+
+		void EnsureFreshAddLabelCache()
+		{
+			if (tank_module.AvailableVolume != oldAvailableVolume || tank_module.type != oldTankType){
+				foreach (FuelTank tank in tank_module.tankList) {
+					double maxVol = tank_module.AvailableVolume * tank.utilization;
+					string maxVolStr = KSPUtil.PrintSI(maxVol, "L");
+					string label = "Max: " + maxVolStr + " (+" + ModuleFuelTanks.FormatMass((float)(tank_module.AvailableVolume * tank.mass)) + " )";
+					addLabelCache[tank.name] = label;
+				}
+				oldAvailableVolume = tank_module.AvailableVolume;
+				oldTankType = tank_module.type;
+			}
 		}
 
 		private void onEditorLoad (ShipConstruct ship, CraftBrowserDialog.LoadType loadType)
@@ -288,6 +306,8 @@ namespace ModularFuelSystem.Tanks
 						}
 					}
 				}
+				GameEvents.onEditorShipModified.Fire (EditorLogic.fetch.ship);
+                tank_module.MarkWindowDirty();
 			}
 		}
 
@@ -316,22 +336,20 @@ namespace ModularFuelSystem.Tanks
 
 			UpdateTank (tank);
 			RemoveTank (tank);
-		}
+        }
 
 		void AddTank (FuelTank tank)
 		{
-			double maxVol = tank_module.AvailableVolume * tank.utilization;
-			string maxVolStr = KSPUtil.PrintSI (maxVol, "L");
-			string extraData = "Max: " + maxVolStr + " (+" + ModuleFuelTanks.FormatMass ((float) (tank_module.AvailableVolume * tank.mass)) + " )";
-
-			GUILayout.Label (extraData, GUILayout.Width (150));
+			GUILayout.Label (addLabelCache[tank.name], GUILayout.Width (150));
 
 			if (GUILayout.Button ("Add", GUILayout.Width (120))) {
 				tank.maxAmount = tank_module.AvailableVolume * tank.utilization;
 				tank.amount = tank.fillable ? tank.maxAmount : 0;
 
 				tank.maxAmountExpression = tank.maxAmount.ToString ();
-				//log.warn("Adding tank " + tank.name + " maxAmount: " + tank.maxAmountExpression ?? "null");
+				GameEvents.onEditorShipModified.Fire (EditorLogic.fetch.ship);
+                tank_module.MarkWindowDirty();
+				//Debug.LogWarning ("[MFT] Adding tank " + tank.name + " maxAmount: " + tank.maxAmountExpression ?? "null");
 			}
 		}
 
@@ -351,7 +369,8 @@ namespace ModularFuelSystem.Tanks
 			//   Other non UI updated maxAmount:       maxAmountExpression = null (set), maxAmount = non-zero
 			//   User has updated the field:           maxAmountExpression != null, maxAmountExpression != maxAmount.ToStringExt
 
-			if (tank_module.part.Resources.Contains (tank.name) && tank_module.part.Resources[tank.name].maxAmount > 0) {
+            // the unmanaged resource changes make this additional check for tank.maxAmount necessary but it may be that it should replace the other PartResource check outright - needs some thought
+			if (tank_module.part.Resources.Contains (tank.name) && tank_module.part.Resources[tank.name].maxAmount > 0 && tank.maxAmount > 0) {
 				EditTank (tank);
 			} else if (tank_module.AvailableVolume >= 0.001) {
 				AddTank (tank);
@@ -372,6 +391,7 @@ namespace ModularFuelSystem.Tanks
 
         private void GUITanks ()
         {
+			EnsureFreshAddLabelCache();
 			foreach (FuelTank tank in tank_module.tankList) {
                 if (tank.canHave)
                     TankLine(tank);

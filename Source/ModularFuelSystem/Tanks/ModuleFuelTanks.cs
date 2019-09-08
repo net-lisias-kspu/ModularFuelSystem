@@ -16,6 +16,23 @@ namespace ModularFuelSystem.Tanks
 {
     public partial class ModuleFuelTanks : PartModule, IModuleInfo, IPartCostModifier, IPartMassModifier
 	{
+        public class UnmanagedResource
+        {
+
+            public UnmanagedResource(string name, double amount, double maxAmount)
+            {
+                this.name = name;
+                this.amount = amount;
+                this.maxAmount = maxAmount;
+            }
+
+            public string name;
+            public double amount;
+            public double maxAmount;
+        }
+
+        public Dictionary<string, UnmanagedResource> unmanagedResources;
+
 		bool compatible = true;
 		bool started;
 
@@ -36,19 +53,23 @@ namespace ModularFuelSystem.Tanks
 		}
 
 		public override void OnAwake ()
-		{
-			enabled = false;
-            // Initialize utilization from the settings file
-            if (utilization == -1)
-                utilization = MFSSettings.partUtilizationDefault;
+        {
+            enabled = false;
 
-            UI_FloatRange f = (UI_FloatRange)(Fields["utilization"].uiControlEditor);
-            f.minValue = minUtilization;
-            f.maxValue = maxUtilization;
-            utilization = Mathf.Clamp(utilization, minUtilization, maxUtilization);
+            InitUtilization();
+
+            unmanagedResources = new Dictionary<string, UnmanagedResource>();
+            if (part.partInfo != null && part.partInfo.partPrefab != null)
+            {
+                if (unmanagedResources.Count == 0)
+                {
+                    unmanagedResources = ((ModuleFuelTanks)part.partInfo.partPrefab.Modules["ModuleFuelTanks"]).unmanagedResources;
+                    //Debug.Log("[ModuleFuelTanks.OnAwake()] unmanagedResources was initialized with count = " + unmanagedResources.Count.ToString());
+                }
+            }
         }
 
-		public override void OnInactive ()
+        public override void OnInactive ()
 		{
 			if (!compatible) {
 				return;
@@ -78,6 +99,18 @@ namespace ModularFuelSystem.Tanks
 			}
 		}
 
+        protected void InitUtilization()
+        {
+            // Initialize utilization from the settings file
+            if (utilization == -1)
+                utilization = MFSSettings.partUtilizationDefault;
+
+            UI_FloatRange f = (UI_FloatRange)(Fields["utilization"].uiControlEditor);
+            f.minValue = minUtilization;
+            f.maxValue = maxUtilization;
+            utilization = Mathf.Clamp(utilization, minUtilization, maxUtilization);
+        }
+
 		void RecordTankTypeResources (HashSet<string> resources, string type)
 		{
 			TankDefinition def;
@@ -105,57 +138,177 @@ namespace ModularFuelSystem.Tanks
 			MFSSettings.managedResources[part.name] = resources;
 		}
 
-		public override void OnLoad (ConfigNode node)
+		void CleanResources ()
 		{
-			if (!compatible) {
-				return;
+			// Destroy any resources still hanging around from the LOADING phase
+			for (int i = part.Resources.Count - 1; i >= 0; --i) {
+				PartResource partResource = part.Resources[i];
+				// Do not remove any resources not managed by MFT
+				if (!tankList.Contains (partResource.resourceName))
+					continue;
+				part.Resources.Remove(partResource.info.id);
+				part.SimulationResources.Remove(partResource.info.id);
 			}
+			RaiseResourceListChanged ();
+			// Setup the mass
+			massDirty = true;
+			CalculateMass();
+		}
 
-            UI_FloatRange f = (UI_FloatRange)(Fields["utilization"].uiControlEditor);
-            f.minValue = minUtilization;
-            f.maxValue = maxUtilization;
-            utilization = Mathf.Clamp(utilization, minUtilization, maxUtilization);
+		public override void OnCopy (PartModule fromModule)
+		{
+			//Debug.Log ($"[ModuleFuelTanks] OnCopy: {fromModule}");
 
-			if (MFSSettings.tankDefinitions == null) {
-				MFSSettings.Initialize ();
-			}
-
-			// Load the volume. If totalVolume is specified, use that to calc the volume
-			// otherwise scale up the provided volume. No KSPField support for doubles
-			if (node.HasValue ("totalVolume") && double.TryParse (node.GetValue ("totalVolume"), out totalVolume)) {
-				ChangeTotalVolume (totalVolume);
-			} else if (node.HasValue ("volume") && double.TryParse (node.GetValue ("volume"), out volume)) {
-				totalVolume = volume * 100d / utilization;
-			}
-			if (isDatabaseLoad) {
-				MFSSettings.SaveOverrideList(part, node.GetNodes("TANK"));
-				ParseBaseMass(node);
-				ParseBaseCost(node);
-                ParseInsulationFactor(node);
-                typesAvailable = node.GetValues ("typeAvailable");
-				RecordManagedResources ();
-			} else if (isEditorOrFlight) {
-				// The amounts initialized flag is there so that the tank type loading doesn't
-				// try to set up any resources. They'll get loaded directly from the save.
-				UpdateTankType (false);
-				// Destroy any resources still hanging around from the LOADING phase
-				for (int i = part.Resources.Count - 1; i >= 0; --i) {
-					PartResource partResource = part.Resources[i];
-					if (!tankList.Contains (partResource.resourceName))
-						continue;
-					part.Resources.Remove(partResource.info.id);
-#if KSP145
-					part.SimulationResources.Remove(partResource.info.id);
-#endif
-				}
-				RaiseResourceListChanged ();
-                // Setup the mass
-                massDirty = true;
-                CalculateMass();
+			var prefab = fromModule as ModuleFuelTanks;
+			utilization = prefab.utilization;
+			totalVolume = prefab.totalVolume;
+			volume = prefab.volume;
+			type = prefab.type;
+			UpdateTankType (false);
+			CleanResources ();
+			tankList.Clear ();
+			for (int i = 0; i < prefab.tankList.Count; i++) {
+				var tank = prefab.tankList[i];
+				//Debug.Log ($"    {tank.name} {tank.amount} {tank.maxAmount}");
+				tankList.Add (tank.CreateCopy (this, null, false));
+				tankList[i].maxAmount = tank.maxAmount;
+				tankList[i].amount = tank.amount;
 			}
 		}
 
-		public override string GetInfo ()
+        public override void OnLoad(ConfigNode node)
+        {
+            if (!compatible)
+            {
+                return;
+            }
+
+            // Make sure this isn't an upgrade node because if we got here during an upgrade application
+            // then RaiseResourceListChanged will throw an error when it hits SendEvent()
+
+            if (node.name == "CURRENTUPGRADE")
+            {
+                // If there's ever a need for special upgrade handling, put that code here.
+            }
+            else
+            {
+
+                InitUtilization();
+                if (MFSSettings.tankDefinitions == null)
+                {
+                    MFSSettings.Initialize();
+                }
+                InitVolume(node);
+
+                ConfigNode[] unmanagedResourceNodes = node.GetNodes("UNMANAGED_RESOURCE");
+                //Debug.Log("[ModuleFuelTanks.OnLoad()] " + unmanagedResourceNodes.Count() + " UNMANAGED_RESOURCE nodes found");
+                for (int i = unmanagedResourceNodes.Count() - 1; i >= 0; --i)
+                {
+                    string name = "";
+                    double amount = 0;
+                    double maxAmount = 0;
+                    // we're going to be strict and demand all of these be present
+                    if (!unmanagedResourceNodes[i].HasValue("name") || !unmanagedResourceNodes[i].HasValue("amount") || !unmanagedResourceNodes[i].HasValue("maxAmount"))
+                    {
+                        Debug.Log("[ModuleFuelTanks.OnLoad()] was missing either name, amount or maxAmount for UNMANAGED_RESOURCE: " + name);
+                        continue;
+                    }
+                    name = unmanagedResourceNodes[i].GetValue("name");
+                    if (PartResourceLibrary.Instance.GetDefinition(name) == null)
+                    {
+                        Debug.Log("[ModuleFuelTanks.OnLoad()] could not find resource by the name of " + name);
+                        continue;
+                    }
+                    double.TryParse(unmanagedResourceNodes[i].GetValue("amount"), out amount);
+                    double.TryParse(unmanagedResourceNodes[i].GetValue("maxAmount"), out maxAmount);
+                    amount = Math.Max(amount, 0d);
+                    maxAmount = Math.Max(amount, maxAmount);
+                    if (!unmanagedResources.ContainsKey(name))
+                    {
+                        if (maxAmount > 0)
+                        {
+                            unmanagedResources.Add(name, new UnmanagedResource(name, amount, maxAmount));
+                            Debug.Log("[ModuleFuelTanks.OnLoad()] added new UnmanagedResource " + name + " with " + amount + "/" + maxAmount);
+                            if (!part.Resources.Contains(name))
+                            {
+                                ConfigNode resNode = new ConfigNode("RESOURCE");
+                                resNode.AddValue("name", name);
+                                resNode.AddValue("amount", amount);
+                                resNode.AddValue("maxAmount", maxAmount);
+                                part.AddResource(resNode);
+                            }
+                        }
+                        else
+                            Debug.Log("[ModuleFuelTanks.OnLoad()] did not add new UnmanagedResource; maxAmount = 0");
+                    }
+                    else
+                    {
+                        if (maxAmount > 0)
+                        {
+                            unmanagedResources[name].amount += amount;
+                            unmanagedResources[name].maxAmount += maxAmount;
+                            //Debug.Log("[ModuleFuelTanks.OnLoad()] modified UnmanagedResource: " + name + "; amount = " + amount + " / maxAmount = " + maxAmount);
+
+                            // this should be safe; if we're here then we previously would have added this resource if missing.
+                            part.Resources[name].amount = Math.Max(part.Resources[name].amount, unmanagedResources[name].amount);
+                            part.Resources[name].maxAmount = Math.Max(part.Resources[name].maxAmount, unmanagedResources[name].maxAmount);
+                        }
+                        else
+                            Debug.Log("[ModuleFuelTanks.OnLoad()] did not add new UnmanagedResource; maxAmount = 0");
+                    }
+                }
+
+                if (isDatabaseLoad)
+                {
+                    MFSSettings.SaveOverrideList(part, node.GetNodes("TANK"));
+                    ParseBaseMass(node);
+                    ParseBaseCost(node);
+                    ParseInsulationFactor(node);
+                    typesAvailable = node.GetValues("typeAvailable");
+                    RecordManagedResources();
+                }
+                else if (isEditorOrFlight)
+                {
+                    // The amounts initialized flag is there so that the tank type loading doesn't
+                    // try to set up any resources. They'll get loaded directly from the save.
+                    UpdateTankType(false);
+
+                    CleanResources();
+
+                    // Destroy any resources still hanging around from the LOADING phase
+                    for (int i = part.Resources.Count - 1; i >= 0; --i)
+                    {
+                        PartResource partResource = part.Resources[i];
+                        if (!tankList.Contains(partResource.resourceName) && !unmanagedResources.ContainsKey(partResource.resourceName))
+                        {
+                            part.Resources.Remove(partResource.info.id);
+                            part.SimulationResources.Remove(partResource.info.id);
+                        }
+                    }
+                    RaiseResourceListChanged();
+
+                    // Setup the mass
+                    massDirty = true;
+                    CalculateMass();
+                }
+            }
+        }
+
+        private void InitVolume(ConfigNode node)
+        {
+            // Load the volume. If totalVolume is specified, use that to calc the volume
+            // otherwise scale up the provided volume. No KSPField support for doubles
+            if (node.HasValue("totalVolume") && double.TryParse(node.GetValue("totalVolume"), out totalVolume))
+            {
+                ChangeTotalVolume(totalVolume);
+            }
+            else if (node.HasValue("volume") && double.TryParse(node.GetValue("volume"), out volume))
+            {
+                totalVolume = volume * 100d / utilization;
+            }
+        }
+
+        public override string GetInfo ()
 		{
 			if (!compatible) {
 				return "";
@@ -212,30 +365,32 @@ namespace ModularFuelSystem.Tanks
             enabled = true;
         }
 
-		public override void OnStart (StartState state)
-		{
-			if (!compatible) {
-				return;
-			}
+        public override void OnStart(StartState state)
+        {
+            if (!compatible) {
+                return;
+            }
             enabled = true; // just in case...
 
-			Events["HideUI"].active = false;
-			Events["ShowUI"].active = true;
+            Events["HideUI"].active = false;
+            Events["ShowUI"].active = true;
 
 
-            if (isEditor) {
-				GameEvents.onPartAttach.Add (onPartAttach);
-				GameEvents.onPartRemove.Add (onPartRemove);
-				GameEvents.onEditorShipModified.Add (onEditorShipModified);
-                GameEvents.onPartActionUIDismiss.Add (OnPartActionGuiDismiss);
-                TankWindow.OnActionGroupEditorOpened.Add (OnActionGroupEditorOpened);
-                TankWindow.OnActionGroupEditorClosed.Add (OnActionGroupEditorClosed);
+            if (isEditor)
+            {
+                GameEvents.onPartAttach.Add(onPartAttach);
+                GameEvents.onPartRemove.Add(onPartRemove);
+                GameEvents.onEditorShipModified.Add(onEditorShipModified);
+                GameEvents.onPartActionUIDismiss.Add(OnPartActionGuiDismiss);
+                TankWindow.OnActionGroupEditorOpened.Add(OnActionGroupEditorOpened);
+                TankWindow.OnActionGroupEditorClosed.Add(OnActionGroupEditorClosed);
+
                 if (part.symmetryCounterparts.Count > 0) {
-                    UpdateTankType (false);
+                    UpdateTankType(false);
                 }
 
-                InitializeTankType ();
-                InitializeUtilization ();
+                InitializeTankType();
+                InitializeUtilization();
             }
 
             OnStartRF(state);
@@ -359,7 +514,7 @@ namespace ModularFuelSystem.Tanks
 		internal FuelTankList tankList = new FuelTankList ();
 
 		[KSPField (isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "Tank Type"), UI_ChooseOption (scene = UI_Scene.Editor)]
-		public string type;
+		public string type = "Default";
 		private string oldType;
 
 		public string[] typesAvailable;
@@ -418,20 +573,25 @@ namespace ModularFuelSystem.Tanks
             if (!def.canHave)
             {
                 type = oldType;
-                if(oldType != null && oldType != "") // we have an old type
+                if (!string.IsNullOrEmpty(oldType)) // we have an old type
                 {
                     def = MFSSettings.tankDefinitions[type];
                     if (def.canHave)
                         return; // go back to old type
                 }
                 // else find one that does work
-                foreach (TankDefinition newDef in MFSSettings.tankDefinitions)
+                if (typesAvailable != null)
                 {
-                    if (newDef.canHave)
+                    for (int i = 0; i < typesAvailable.Length; i++)
                     {
-                        def = newDef;
-                        type = newDef.name;
-                        break;
+                        string tn = typesAvailable[i];
+                        TankDefinition newDef = MFSSettings.tankDefinitions.Contains(tn) ? MFSSettings.tankDefinitions[tn] : null;
+                        if (newDef != null && newDef.canHave)
+                        {
+                            def = newDef;
+                            type = newDef.name;
+                            break;
+                        }
                     }
                 }
                 if (type == oldType) // if we didn't find a new one
@@ -460,7 +620,7 @@ namespace ModularFuelSystem.Tanks
 			for (int i = part.Resources.Count - 1; i >= 0; --i) {
 				PartResource partResource = part.Resources[i];
 				string resname = partResource.resourceName;
-				if (!managed.Contains(resname) || tankList.Contains(resname))
+				if (!managed.Contains(resname) || tankList.Contains(resname) || unmanagedResources.ContainsKey(resname))
 					continue;
 				part.Resources.Remove (partResource.info.id);
 #if KSP145
@@ -564,6 +724,14 @@ namespace ModularFuelSystem.Tanks
 		public void ChangeTotalVolume (double newTotalVolume, bool propagate = false)
 		{
 			double newVolume = Math.Round (newTotalVolume * utilization * 0.01d, 4);
+
+            if (Double.IsInfinity(newVolume / volume))
+            {
+                totalVolume = newTotalVolume;
+                volume = newVolume;
+                Debug.LogWarning("[ModularFuelTanks] caught DIV/0 in ChangeTotalVolume. Setting volume/totalVolume and exiting function");
+                return;
+            }
 			double volumeRatio = newVolume / volume;
 
 			bool doResources = false;
@@ -741,7 +909,7 @@ namespace ModularFuelSystem.Tanks
 				string volStr = KSPUtil.PrintSI (volume, MFSSettings.unitLabel);
 				volumeDisplay = "Avail: " + availVolStr + " / Tot: " + volStr;
 
-				double resourceMass = part.Resources.Cast<PartResource> ().Sum (r => r.maxAmount*r.info.density);
+				double resourceMass = part.Resources.Cast<PartResource> ().Sum (partResource => partResource.maxAmount* partResource.info.density);
 
 				double wetMass = mass + resourceMass;
 				massDisplay = "Dry: " + FormatMass (mass) + " / Wet: " + FormatMass ((float)wetMass);
@@ -833,8 +1001,10 @@ namespace ModularFuelSystem.Tanks
 
 		public void RaiseResourceListChanged ()
 		{
-			MarkWindowDirty();
+			GameEvents.onPartResourceListChange.Fire (part);
+			part.ResetSimulationResources ();
 			part.SendEvent ("OnResourceListChanged", null, 0);
+			MarkWindowDirty();
 		}
 
 		public void PartResourcesChanged ()
@@ -843,14 +1013,14 @@ namespace ModularFuelSystem.Tanks
 			massDirty = true;
 		}
 
-		[KSPEvent (guiActiveEditor = true, guiName = "Hide UI", active = false)]
+		[KSPEvent (guiActiveEditor = true, guiName = "Hide Tank UI", active = false)]
 		public void HideUI ()
 		{
 			TankWindow.HideGUI ();
 			UpdateMenus (false);
 		}
 
-		[KSPEvent (guiActiveEditor = true, guiName = "Show UI", active = false)]
+		[KSPEvent (guiActiveEditor = true, guiName = "Show Tank UI", active = false)]
 		public void ShowUI ()
 		{
 			TankWindow.ShowGUI (this);
@@ -969,15 +1139,17 @@ namespace ModularFuelSystem.Tanks
 					};
 					Events.Add (button);
 				}
-				//MarkWindowDirty ();
+				MarkWindowDirty ();
 			}
 		}
 
 		public void ConfigureFor (Part engine)
 		{
-			foreach (PartModule engine_module in engine.Modules) {
+			foreach (PartModule engine_module in engine.Modules)
+            {
 				List<Propellant> propellants = GetEnginePropellants (engine_module);
-				if ((object)propellants != null) {
+				if ((object)propellants != null)
+                {
 					ConfigureFor (new FuelInfo (propellants, this, engine.partInfo.title));
 					break;
 				}
@@ -990,16 +1162,20 @@ namespace ModularFuelSystem.Tanks
 				return;
 
 			double availableVolume = AvailableVolume;
-			foreach (Propellant tfuel in fi.propellants) {
-				if (PartResourceLibrary.Instance.GetDefinition (tfuel.name).resourceTransferMode != ResourceTransferMode.NONE) {
+			foreach (Propellant tfuel in fi.propellants)
+            {
+				if (PartResourceLibrary.Instance.GetDefinition (tfuel.name).resourceTransferMode != ResourceTransferMode.NONE)
+                {
 					FuelTank tank;
-					if (tankList.TryGet (tfuel.name, out tank)) {
+					if (tankList.TryGet (tfuel.name, out tank))
+                    {
 						double amt = availableVolume * tfuel.ratio / fi.efficiency;
 						tank.maxAmount += amt;
 						tank.amount += amt;
 					}
 				}
 			}
+			GameEvents.onEditorShipModified.Fire (EditorLogic.fetch.ship);
 		}
 
         List<Propellant> GetEnginePropellants(PartModule engine)
@@ -1019,6 +1195,7 @@ namespace ModularFuelSystem.Tanks
         partial void UpdateTankTypeRF(TankDefinition def);
         partial void GetModuleCostRF(ref double cost);
         partial void CalculateMassRF(ref double mass);
+        partial void OnLoadRF(ConfigNode node);
 
         #endregion
 

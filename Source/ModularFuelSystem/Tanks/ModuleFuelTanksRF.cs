@@ -13,9 +13,9 @@ namespace ModularFuelSystem.Tanks
         private double analyticInternalTemp;
         private double previewInternalFluxAdjust;
         private bool supportsBoiloff = false;
+        public bool SupportsBoiloff => supportsBoiloff;
         public double sunAndBodyFlux = 0;
-
-        public double outerInsulationFactor = 0.0;
+        private double oldTotalVolume;
 
         public int numberOfMLILayers = 0; // base number of layers taken from TANK_DEFINITION configs
 
@@ -56,6 +56,15 @@ namespace ModularFuelSystem.Tanks
         [KSPField(isPersistant = true)]
         public double partPrevTemperature = -1;
 
+        [KSPField]
+        public int maxMLILayers = 10;
+
+        [KSPField]
+        public float MLIArealCost = 0.20764f;
+
+        [KSPField]
+        public float MLIArealDensity = 0.000015f;
+
         private static double ConductionFactors => RFSettings.Instance.globalConductionCompensation ? Math.Max(1.0d, PhysicsGlobals.ConductionFactor) : 1d;
 
         public double BoiloffMassRate => boiloffMass;
@@ -70,6 +79,7 @@ namespace ModularFuelSystem.Tanks
             base.OnStart(state);
 
             GameEvents.onVesselWasModified.Add(OnVesselWasModified);
+            GameEvents.onEditorShipModified.Add(OnEditorShipModified);
             GameEvents.onPartDestroyed.Add(OnPartDestroyed);
             if (HighLogic.LoadedSceneIsFlight)
             {
@@ -106,18 +116,34 @@ namespace ModularFuelSystem.Tanks
             }
 
             if (state == StartState.Editor)
+            {
+                ((UI_FloatRange)Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor).maxValue = maxMLILayers;
                 Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor.onFieldChanged = delegate (BaseField field, object value)
                 {
                     massDirty = true;
                     CalculateMass();
                 };
+            }
 
-            Fields[nameof(debug0Display)].guiActive = RFSettings.Instance.debugBoilOff && this.supportsBoiloff;
-            Fields[nameof(debug1Display)].guiActive = RFSettings.Instance.debugBoilOff && this.supportsBoiloff;
-            Fields[nameof(debug2Display)].guiActive = RFSettings.Instance.debugBoilOff && this.supportsBoiloff;
+            Fields[nameof(debug0Display)].guiActive = this.supportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
+            Fields[nameof(debug1Display)].guiActive = this.supportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
+            Fields[nameof(debug2Display)].guiActive = this.supportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
 
             //numberOfAddedMLILayers = Mathf.Round(numberOfAddedMLILayers);
             //CalculateInsulation();
+        }
+
+        private bool IsProcedural()
+        {
+            return this.part.Modules.Contains("SSTUModularPart")
+                || this.part.Modules.Contains("ProceduralPart")
+                || this.part.Modules.Contains("WingProcedural")
+                || this.part.Modules.Contains("ModuleROTank");
+        }
+
+        // TODO: Placeholder for moving RF specific nodes out of ModuleFuelTanks.OnLoad()
+        partial void OnLoadRF(ConfigNode node)
+        {
         }
 
         private void CalculateInsulation()
@@ -189,6 +215,7 @@ namespace ModularFuelSystem.Tanks
                 log.dbg("num20 (unknownFactor) = {0}", num20.ToString("F16"));
                 log.dbg("num14                 = {0}", num14.ToString("F16"));
             }
+            //Debug.Log("part.skinInteralConductionFlux = " + part.ptd.skinInteralConductionFlux.ToString("F16"));
         }
 
         partial void CalculateMassRF(ref double mass)
@@ -197,7 +224,7 @@ namespace ModularFuelSystem.Tanks
                 CalculateTankArea();
 
             //numberOfAddedMLILayers = Mathf.Round(numberOfAddedMLILayers);
-            mass += 0.000015 * totalTankArea * totalMLILayers;
+            mass += MLIArealDensity * totalTankArea * totalMLILayers;
         }
 
         partial void GetModuleCostRF(ref double cost)
@@ -205,25 +232,23 @@ namespace ModularFuelSystem.Tanks
             if (totalTankArea <= 0)
                 CalculateTankArea();
 
-            //numberOfAddedMLILayers = Mathf.Round(numberOfAddedMLILayers);
-            // TODO Determine cost and add that to cst
             // Estimate material cost at 0.10764/m2 treating as Fund = $1000 (for RO purposes)
             // Plus another 0.1 for installation
-            cost += (float)(0.20764 * totalTankArea * totalMLILayers);
+            cost += (float)(MLIArealCost * totalTankArea * totalMLILayers);
         }
 
         public void FixedUpdate()
         {
-            log.dbg("{0}", Time.time);
+            //print ("[Real Fuels]" + Time.time.ToString ());
             if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready)
             {
-                if (RFSettings.Instance.debugBoilOff)
+                if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
                 {
                     debug1Display = "";
                     debug2Display = "";
                     debug0Display = "";
                     debug3Display = "";
-                    Fields[nameof(debug3Display)].guiActive = RFSettings.Instance.debugBoilOff && this.supportsBoiloff && TimeWarp.CurrentRate > PhysicsGlobals.ThermalMaxIntegrationWarp;
+                    Fields[nameof(debug3Display)].guiActive = (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW) && this.supportsBoiloff && TimeWarp.CurrentRate > PhysicsGlobals.ThermalMaxIntegrationWarp;
                 }
 
                 // MLI performance varies by temperature delta
@@ -273,7 +298,7 @@ namespace ModularFuelSystem.Tanks
                 double deltaTimeRecip = 1d / deltaTime;
                 log.detail("internalFlux = {0}, thermalInternalFluxPrevious = {1}, analytic internal flux = {2}", part.thermalInternalFlux, part.thermalInternalFluxPrevious, previewInternalFluxAdjust);
 
-                if (RFSettings.Instance.debugBoilOff)
+                if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
                 {
                     string MLIText = totalMLILayers > 0 ? GetMLITransferRate(part.skinTemperature, part.temperature).ToString("F4") : "No MLI";
                     debug0Display = part.temperature.ToString("F4") + "(" + MLIText + " * " + (part.radiativeArea * part.skinExposedAreaFrac).ToString("F2") + "m2)";
@@ -318,7 +343,7 @@ namespace ModularFuelSystem.Tanks
 
                         deltaTemp = hotTemp - tank.temperature;
 
-                        if (RFSettings.Instance.debugBoilOff)
+                        if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
                         {
                             if (debug2Display != "")
                                 debug2Display += " / ";
@@ -333,7 +358,8 @@ namespace ModularFuelSystem.Tanks
 #if DEBUG
 	                        if (analyticalMode) log.dbg("Tank {0} surface area = {1}", tank.name, tank.totalArea);
 #endif
-                            double wettedArea = tank.totalArea;// disabled until proper wetted vs ullage conduction can be done (tank.amount / tank.maxAmount);
+
+                            double wettedArea = tank.totalArea; // disabled until proper wetted vs ullage conduction can be done (tank.amount / tank.maxAmount);
 
                             if (tank.isDewar)
                                 Q = GetDewarTransferRate(hotTemp, tank.temperature, tank.totalArea);
@@ -350,7 +376,7 @@ namespace ModularFuelSystem.Tanks
                             else
                                 log.dbg("Q = NaN! W - T - F!!!");
 
-                            if (RFSettings.Instance.debugBoilOff)
+                            if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
                             {
                                 // Only do debugging displays if debugging enabled in RFSettings
 
@@ -368,11 +394,13 @@ namespace ModularFuelSystem.Tanks
                         {
                             if (lossAmount > tank.amount)
                             {
-								tank.amount = 0d;
+                                if (!CheatOptions.InfinitePropellant)
+                                    tank.amount = 0d;
                             }
                             else
                             {
-                                tank.amount -= lossAmount;
+                                if (!CheatOptions.InfinitePropellant)
+                                    tank.amount -= lossAmount;
 
                                 // See if there is boiloff byproduct and see if any other parts want to accept it.
                                 if (tank.boiloffProductResource != null)
@@ -453,6 +481,41 @@ namespace ModularFuelSystem.Tanks
             highlyPressurized = def.highlyPressurized;
             numberOfMLILayers = def.numberOfMLILayers;
 
+            if (def.maxMLILayers >= 0f)
+            {
+                maxMLILayers = def.maxMLILayers;
+            }
+            else
+            {
+                maxMLILayers = (int)Fields[nameof(maxMLILayers)].originalValue;
+            }
+
+            if (HighLogic.LoadedSceneIsEditor)
+            {
+                ((UI_FloatRange)Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor).maxValue = maxMLILayers;
+                _numberOfAddedMLILayers = Math.Min(_numberOfAddedMLILayers, maxMLILayers);
+            }
+
+            if (def.minUtilization > 0f)
+            {
+                minUtilization = def.minUtilization;
+            }
+            else
+            {
+                minUtilization = (float)Fields[nameof(minUtilization)].originalValue;
+            }
+
+            if (def.maxUtilization > 0f)
+            {
+                maxUtilization = def.maxUtilization;
+            }
+            else
+            {
+                maxUtilization = (float)Fields[nameof(maxUtilization)].originalValue;
+            }
+
+            InitUtilization();
+
             if (isDatabaseLoad)
                 UpdateEngineIgnitor(def);
         }
@@ -472,16 +535,11 @@ namespace ModularFuelSystem.Tanks
             }
         }
 
-        /*
-        partial void ParseInsulationFactor(TankDefinition tank)
+        partial void ParseInsulationFactor(ConfigNode node)
         {
-            tank.numberOfMLILayers;
             if (node.HasValue("numberOfMLILayers"))
                 int.TryParse(node.GetValue("numberOfMLILayers"), out numberOfMLILayers);
-            else if (node.HasValue("outerInsulationFactor"))
-                double.TryParse(node.GetValue("outerInsulationFactor"), out outerInsulationFactor);
         }
-        */
 
         public void CalculateTankArea()
         {
@@ -494,11 +552,20 @@ namespace ModularFuelSystem.Tanks
 
             if (HighLogic.LoadedSceneIsEditor)
             {
-                if (!this.part.DragCubes.None)
+                if (!this.part.DragCubes.None && this.oldTotalVolume != this.totalVolume)
                 {
-                    this.part.DragCubes.SetDragWeights();
-                    this.part.DragCubes.RequestOcclusionUpdate();
-                    this.part.DragCubes.SetPartOcclusion();
+
+                    if (this.IsProcedural())
+                    {
+                        bool origProceduralValue = this.part.DragCubes.Procedural;
+                        this.part.DragCubes.Procedural = true;
+                        this.part.DragCubes.ForceUpdate(true, true, true);
+                        this.part.DragCubes.SetDragWeights();
+                        this.part.DragCubes.RequestOcclusionUpdate();
+                        this.part.DragCubes.SetPartOcclusion();
+                        this.part.DragCubes.Procedural = origProceduralValue;
+                        this.oldTotalVolume = this.totalVolume;
+                    }
                 }
             }
 
@@ -518,6 +585,10 @@ namespace ModularFuelSystem.Tanks
             // then we're going to be defaulting to spherical calculation
             double tankMaxAmount;
             double tempTotal = 0;
+
+            if (RFSettings.Instance.debugBoilOff)
+                Debug.Log("[RealFuels.ModuleFuelTankRF] Initializing " + part.name + ".totalTankArea as " + totalTankArea.ToString());
+
             for (int i = tankList.Count - 1; i >= 0; --i)
             {
                 FuelTank tank = tankList[i];
@@ -545,8 +616,14 @@ namespace ModularFuelSystem.Tanks
             }
             if (!(totalTankArea > 0) || tempTotal > totalTankArea)
                 totalTankArea = tempTotal;
+            if (RFSettings.Instance.debugBoilOff)
+            {
+                Debug.Log("[RealFuels.ModuleFuelTankRF] " + part.name + ".totalTankArea = " + totalTankArea.ToString());
+                Debug.Log("[RealFuels.ModuleFuelTankRF] " + part.name + ".GetModuleSize()" + part.GetModuleSize(Vector3.zero).ToString("F2"));
+            }
         }
 
+        // todo Evaluate if we really still need this. Not sure it's being fired in the editor at all anymore; even when mods known to fire this event are doing so.
         public void OnVesselWasModified(Vessel v)
         {
             log.detail("ModuleFuelTanksRF.OnVesselWasModified()");
@@ -554,10 +631,20 @@ namespace ModularFuelSystem.Tanks
                 CalculateTankArea();
         }
 
+        public void OnEditorShipModified(ShipConstruct ship)
+        {
+            //Debug.Log("ModuleFuelTanksRF.OnEditorShipModified()");
+            CalculateTankArea();
+        }
+
         private void OnPartDestroyed(Part p)
         {
-            GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
-            GameEvents.onPartDestroyed.Remove(OnPartDestroyed);
+            if (p == this.part)
+            {
+                GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
+                GameEvents.onPartDestroyed.Remove(OnPartDestroyed);
+                GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
+            }
         }
 
         private bool CalculateLowestTankTemperature()
@@ -584,6 +671,7 @@ namespace ModularFuelSystem.Tanks
 #if DEBUG
             if(this.supportsBoiloff) log.dbg("{0} Analytic Temp = {1}, Analytic Internal = {2}, Analytic Skin = {3}", part.name, analyticTemp, predictedInternalTemp, predictedSkinTemp);
 #endif
+            
             analyticSkinTemp = predictedSkinTemp;
             analyticInternalTemp = predictedInternalTemp;
 

@@ -302,6 +302,7 @@ namespace ModularFuelSystem
         }
         bool needSetPropStatus = true;
         Color ullageColor = XKCDColors.White;
+
         public override void FixedUpdate()
         {
             if (HighLogic.LoadedSceneIsEditor)
@@ -399,6 +400,7 @@ namespace ModularFuelSystem
             }
 
             EngineIgnited = true;
+            base.Activate();
 
             if (allowShutdown)
                 Events["Shutdown"].active = true;

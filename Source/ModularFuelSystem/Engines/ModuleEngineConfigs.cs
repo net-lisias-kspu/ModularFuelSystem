@@ -271,7 +271,7 @@ namespace ModularFuelSystem
                     minTechLevel = (origTechLevel < techLevel ? origTechLevel : techLevel);
             }
 
-            if(origMass >= 0)
+            if(origMass > 0)
             {
                 massDelta = 0;
                 part.mass = origMass * RFSettings.Instance.EngineMassMultiplier;
@@ -675,15 +675,20 @@ namespace ModularFuelSystem
                 }
                 if (type.Equals("ModuleRCS") || type.Equals("ModuleRCSFX"))
                 {
-                    ModuleRCS rcs = (ModuleRCS)pModule;
-                    if (rcs != null)
+                    // Changed this to find ALL RCS modules on the part to address SSTU case where MUS with only aft RCS is not handled.
+                    List<ModuleRCS> RCSModules = part.Modules.OfType<ModuleRCS>().ToList();
+                    
+                    if (RCSModules.Count > 0)
                     {
                         DoConfig(config);
-                        if (config.HasNode("PROPELLANT"))
+                        for (int i = 0; i < RCSModules.Count; i++)
                         {
-                            rcs.propellants.Clear();
+                            if (config.HasNode("PROPELLANT"))
+                            {
+                                RCSModules[i].propellants.Clear();
+                            }
+                            RCSModules[i].Load(config);
                         }
-                        pModule.Load(config);
                     }
                 }
                 else
@@ -777,7 +782,32 @@ namespace ModularFuelSystem
                 // set gimbal
                 if (config.HasValue("gimbalRange"))
                 {
+
                     float newGimbal = float.Parse(config.GetValue("gimbalRange"));
+
+                    float newGimbalXP = -1;
+                    float newGimbalXN = -1;
+                    float newGimbalYP = -1;
+                    float newGimbalYN = -1;
+
+                    if (config.HasValue("gimbalRangeXP"))
+                        newGimbalXP = float.Parse(config.GetValue("gimbalRangeXP"));
+                    if (config.HasValue("gimbalRangeXN"))
+                        newGimbalXN = float.Parse(config.GetValue("gimbalRangeXN"));
+                    if (config.HasValue("gimbalRangeYP"))
+                        newGimbalYP = float.Parse(config.GetValue("gimbalRangeYP"));
+                    if (config.HasValue("gimbalRangeYN"))
+                        newGimbalYN = float.Parse(config.GetValue("gimbalRangeYN"));
+
+                    if (newGimbalXP < 0)
+                        newGimbalXP = newGimbal;
+                    if (newGimbalXN < 0)
+                        newGimbalXN = newGimbal;
+                    if (newGimbalYP < 0)
+                        newGimbalYP = newGimbal;
+                    if (newGimbalYN < 0)
+                        newGimbalYN = newGimbal;
+
                     for (int m = 0; m < part.Modules.Count; ++m)
                     {
                         if (part.Modules[m] is ModuleGimbal)
@@ -786,7 +816,10 @@ namespace ModularFuelSystem
                             if (gimbalTransform.Equals(string.Empty) || g.gimbalTransformName.Equals(gimbalTransform))
                             {
                                 g.gimbalRange = newGimbal;
-                                break;
+                                g.gimbalRangeXN = newGimbalXN;
+                                g.gimbalRangeXP = newGimbalXP;
+                                g.gimbalRangeYN = newGimbalYN;
+                                g.gimbalRangeYP = newGimbalYP;
                             }
                         }
                     }
@@ -829,7 +862,14 @@ namespace ModularFuelSystem
             }
             else
             {
-                log.error("could not find configuration of name {0} and could find no fallback config.\nFor part {1}, Current nodes: {2}", configuration, part.name, Utilities.PrintConfigs(configs));
+                Debug.LogWarning("*RFMEC* WARNING could not find configuration of name " + configuration + " for part " + part.name + ": Attempting to locate fallback configuration.");
+                if (configs.Count > 0)
+                {
+                    configuration = configs[0].GetValue("name");
+                    SetConfiguration();
+                }
+                else
+                    Debug.LogError("*RFMEC* ERROR unable to locate any fallbacks for configuration " + configuration + ",\n Current nodes:" + Utilities.PrintConfigs(configs));
             }
 
             StopFX();
@@ -1199,7 +1239,7 @@ namespace ModularFuelSystem
 
         private void OnPartActionGuiDismiss(Part p)
         {
-            if (p == part)
+            if (p == part || p.isSymmetryCounterPart(part))
                 showRFGUI = false;
         }
 
@@ -1213,84 +1253,80 @@ namespace ModularFuelSystem
 
         private static Vector3 mousePos = Vector3.zero;
         private Rect guiWindowRect = new Rect(0, 0, 0, 0);
-        public static string myToolTip = string.Empty;
+        private string myToolTip = string.Empty;
         private int counterTT;
         private bool styleSetup = false;
+        private bool editorLocked = false;
+        
         public void OnGUI()
         {
+            if (!compatible || !isMaster || !HighLogic.LoadedSceneIsEditor || EditorLogic.fetch == null)
+                return;
+
+            bool inPartsEditor = EditorLogic.fetch.editorScreen == EditorScreen.Parts;
+            if (!(showRFGUI && inPartsEditor) && !(EditorLogic.fetch.editorScreen == EditorScreen.Actions && EditorActionGroups.Instance.GetSelectedParts().Contains(part)))
+            {
+                editorUnlock();
+                return;
+            }
+            
+            if (inPartsEditor)
+            {
+                List<Part> symmetryParts = part.symmetryCounterparts;
+                for(int i = 0; i < symmetryParts.Count; i++)
+                {
+                    if (symmetryParts[i].persistentId < part.persistentId)
+                        return;
+                }
+            }
+
             if (!styleSetup)
             {
                 styleSetup = true;
                 Styles.InitStyles ();
             }
 
-            if (!compatible)
-                return;
-
-            Rect tooltipRect;
-            bool cursorInGUI = false; // nicked the locking code from Ferram
+            if (guiWindowRect.width == 0)
+            {
+                int posAdd = inPartsEditor ? 256 : 0;
+                int posMult = (offsetGUIPos == -1) ? (part.Modules.Contains("ModuleFuelTanks") ? 1 : 0) : offsetGUIPos;
+                guiWindowRect = new Rect(posAdd + 430 * posMult, 365, 430, (Screen.height - 365));
+            }
+            
             mousePos = Input.mousePosition; //Mouse location; based on Kerbal Engineer Redux code
             mousePos.y = Screen.height - mousePos.y;
-            EditorLogic editor = EditorLogic.fetch;
-            if (!HighLogic.LoadedSceneIsEditor || !editor || !isMaster)
-            {
-                return;
-            }
-
-            int posMult = 0;
-            if (offsetGUIPos != -1)
-                posMult = offsetGUIPos;
-            if (editor.editorScreen == EditorScreen.Actions && EditorActionGroups.Instance.GetSelectedParts().Contains(part))
-            {
-                if (offsetGUIPos == -1 && part.Modules.Contains("ModuleFuelTanks"))
-                    posMult = 1;
-                if (guiWindowRect.width == 0)
-                    guiWindowRect = new Rect(430 * posMult, 365, 430, (Screen.height - 365));
-
-                tooltipRect = new Rect(guiWindowRect.xMin + 440, mousePos.y - 5, 300, 200);
-
-                cursorInGUI = guiWindowRect.Contains(mousePos);
-                if (cursorInGUI)
-                {
-                    editor.Lock(false, false, false, "RFGUILock");
-                    if (KSP.UI.Screens.Editor.PartListTooltipMasterController.Instance != null)
-                        KSP.UI.Screens.Editor.PartListTooltipMasterController.Instance.HideTooltip();
-                }
-                else
-                {
-                    editor.Unlock("RFGUILock");
-                }
-            }
-            else if (showRFGUI && editor.editorScreen == EditorScreen.Parts)
-            {
-                if (guiWindowRect.width == 0)
-                    guiWindowRect = new Rect(256 + 430 * posMult, 365, 430, (Screen.height - 365));
-
-                tooltipRect = new Rect(guiWindowRect.xMin - (230 - 8), mousePos.y - 5, 220, 200);
-
-                cursorInGUI = guiWindowRect.Contains(mousePos);
-                if (cursorInGUI)
-                {
-                    editor.Lock(false, false, false, "RFGUILock");
-                    if (KSP.UI.Screens.Editor.PartListTooltipMasterController.Instance != null)
-                        KSP.UI.Screens.Editor.PartListTooltipMasterController.Instance.HideTooltip();
-                }
-                else
-                {
-                    editor.Unlock("RFGUILock");
-                }
-            }
+            if (guiWindowRect.Contains(mousePos))
+                editorLock();
             else
-            {
-                showRFGUI = false;
-                editor.Unlock("RFGUILock");
-                return;
-            }
+                editorUnlock();
+
             myToolTip = myToolTip.Trim ();
             if (!String.IsNullOrEmpty(myToolTip))
-                GUI.Label(tooltipRect, myToolTip, Styles.styleEditorTooltip);
+            {
+                int offset = inPartsEditor ? -222 : 440;
+                int width = inPartsEditor ? 220 : 300;
+                GUI.Label(new Rect(guiWindowRect.xMin + offset, mousePos.y - 5, width, 200), myToolTip, Styles.styleEditorTooltip);
+            }
 
-            guiWindowRect = GUILayout.Window(part.name.GetHashCode() + 1, guiWindowRect, engineManagerGUI, "Configure " + part.partInfo.title, Styles.styleEditorPanel);
+            guiWindowRect = GUILayout.Window(unchecked((int)part.persistentId), guiWindowRect, engineManagerGUI, "Configure " + part.partInfo.title, Styles.styleEditorPanel);
+        }
+
+        private void editorLock() {
+            if (!editorLocked)
+            {
+                EditorLogic.fetch.Lock(false, false, false, "RFGUILock");
+                editorLocked = true;
+                if (KSP.UI.Screens.Editor.PartListTooltipMasterController.Instance != null)
+                    KSP.UI.Screens.Editor.PartListTooltipMasterController.Instance.HideTooltip();
+            }
+        }
+
+        private void editorUnlock() {
+            if (editorLocked)
+            {
+                EditorLogic.fetch.Unlock("RFGUILock");
+                editorLocked = false;
+            }
         }
 
         /*private int oldTechLevel = -1;
@@ -1364,6 +1400,7 @@ namespace ModularFuelSystem
                             {
                                 SetConfiguration(nName, true);
                                 UpdateSymmetryCounterparts();
+                                MarkWindowDirty();
                             }
                         }
                         else
@@ -1379,6 +1416,7 @@ namespace ModularFuelSystem
                                     {
                                         SetConfiguration(nName, true);
                                         UpdateSymmetryCounterparts();
+                                        MarkWindowDirty();
                                     }
                                 }
                             }
@@ -1390,6 +1428,7 @@ namespace ModularFuelSystem
                                 {
                                     SetConfiguration(nName, true);
                                     UpdateSymmetryCounterparts();
+                                    MarkWindowDirty();
                                 }
                             }
                         }
@@ -1422,6 +1461,7 @@ namespace ModularFuelSystem
                     techLevel--;
                     SetConfiguration();
                     UpdateSymmetryCounterparts();
+                    MarkWindowDirty();
                 }
                 GUILayout.Label(techLevel.ToString());
                 string plusStr = "X";
@@ -1473,6 +1513,7 @@ namespace ModularFuelSystem
                         techLevel++;
                         SetConfiguration();
                         UpdateSymmetryCounterparts();
+                        MarkWindowDirty();
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -1644,8 +1685,72 @@ namespace ModularFuelSystem
             }
             return null;
         }
-        #endregion
 
 		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<ModuleHybridEngine>(true);
+        protected static List<PartModule> GetSpecifiedModules(Part p, string eID, int mIdx, string eType, bool weakType)
+        {
+            int mCount = p.Modules.Count;
+            int tmpIdx = 0;
+            List<PartModule> pMs = new List<PartModule>();
+
+            for (int m = 0; m < mCount; ++m)
+            {
+                PartModule pM = p.Modules[m];
+                bool test = false;
+                if (weakType)
+                {
+                    if (eType.Contains("ModuleEngines"))
+                        test = pM is ModuleEngines;
+                    else if (eType.Contains("ModuleRCS"))
+                        test = pM is ModuleRCS;
+                }
+                else
+                    test = pM.GetType().Name.Equals(eType);
+
+                if (test)
+                {
+                    if (mIdx >= 0)
+                    {
+                        if (tmpIdx == mIdx)
+                        {
+                            pMs.Add(pM);
+                        }
+                        tmpIdx++;
+                        continue; // skip the next test
+                    }
+                    else if (eID != string.Empty)
+                    {
+                        string testID = string.Empty;
+                        if (pM is ModuleEngines)
+                            testID = (pM as ModuleEngines).engineID;
+                        else if (pM is ModuleEngineConfigs)
+                            testID = (pM as ModuleEngineConfigs).engineID;
+
+                        if (testID.Equals(eID))
+                            pMs.Add(pM);
+                    }
+                    else
+                        pMs.Add(pM);
+                }
+            }
+            return pMs;
+        }
+
+        internal void MarkWindowDirty()
+        {
+            UIPartActionWindow action_window;
+            if (UIPartActionController.Instance == null)
+            {
+                // no controller means no window to mark dirty
+                return;
+            }
+            action_window = UIPartActionController.Instance.GetItem(part);
+            if (action_window == null)
+            {
+                return;
+            }
+            action_window.displayDirty = true;
+        }
+        #endregion
     }
 }
