@@ -34,6 +34,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="KSPe.UI">
+      <HintPath>..\..\..\..\..\..\LIB\plugins\KSPe.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -69,9 +72,14 @@
     <Compile Include="Properties\VersionRF.cs">
       <DependentUpon>VersionRF.tt</DependentUpon>
     </Compile>
-    <Compile Include="assembly\Checkers.cs">
-      <Link>Properties\Checkers.cs</Link>
+    <Compile Include="assembly\AssemblyInfoRF.cs">
+      <Link>Properties\AssemblyInfoRF.cs</Link>
     </Compile>
+    <Compile Include="Properties\Configuration.cs">
+      <DependentUpon>Configuration.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <Compile Include="Utilities\Log.cs" />
     <Compile Include="assembly\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>

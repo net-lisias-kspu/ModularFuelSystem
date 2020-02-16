@@ -33,9 +33,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="MFSSettings.cs" />
-    <Compile Include="assembly\Checkers.cs">
-      <Link>Properties\Checkers.cs</Link>
-    </Compile>
     <Compile Include="assembly\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>
@@ -69,6 +66,11 @@
     <Compile Include="assembly\AssemblyInfoMFT.cs">
       <Link>Properties\AssemblyInfoMFT.cs</Link>
     </Compile>
+    <Compile Include="Properties\Configuration.cs">
+      <DependentUpon>Configuration.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <Compile Include="Utilities\Log.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -80,6 +82,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="KSPe.UI">
+      <HintPath>..\..\..\..\..\..\LIB\plugins\KSPe.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -88,6 +93,10 @@
     <None Include="Properties\VersionMFT.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>VersionMFT.cs</LastGenOutput>
+    </None>
+    <None Include="Properties\Configuration.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Configuration.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <PropertyGroup>

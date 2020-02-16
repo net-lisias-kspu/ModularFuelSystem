@@ -29,3 +29,6 @@ using System.Runtime.CompilerServices;
 
 [assembly: KSPAssembly("RealFuels", ModularFuelSystem.Version.major, ModularFuelSystem.Version.minor)]
 [assembly: KSPAssemblyDependency("SolverEngines", 3, 3)]
+
+[assembly: KSPAssemblyDependency("KSPe", 2, 1)]
+[assembly: KSPAssemblyDependency("KSPe.UI", 2, 1)]
