@@ -1,8 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Reflection;
-
-using KSP.IO;
 
 namespace ModularFuelSystem {
 
