@@ -187,20 +187,27 @@ namespace ModularFuelSystem.Tanks
 
             // Make sure this isn't an upgrade node because if we got here during an upgrade application
             // then RaiseResourceListChanged will throw an error when it hits SendEvent()
-
             if (node.name == "CURRENTUPGRADE")
             {
                 // If there's ever a need for special upgrade handling, put that code here.
+
+                // Special handling for adding tank types via upgrade system
+                string[] typeAvailableUpgrades = node.GetValues("typeAvailable");
+                if (typeAvailableUpgrades.Count() > 0)
+                {
+                    for (int i = 0; i < typeAvailableUpgrades.Count(); i++)
+                        typesAvailable.AddUnique(typeAvailableUpgrades[i]);
+                    if (typesAvailable.Count() > 0 && !typesAvailable.Contains(type))
+                        typesAvailable.Add(type);
+                    InitializeTankType();
+                }
             }
             else
             {
-
-                InitUtilization();
                 if (MFSSettings.tankDefinitions == null)
                 {
                     MFSSettings.Initialize();
                 }
-                InitVolume(node);
 
                 ConfigNode[] unmanagedResourceNodes = node.GetNodes("UNMANAGED_RESOURCE");
                 //Debug.Log("[ModuleFuelTanks.OnLoad()] " + unmanagedResourceNodes.Count() + " UNMANAGED_RESOURCE nodes found");
@@ -262,11 +269,16 @@ namespace ModularFuelSystem.Tanks
 
                 if (isDatabaseLoad)
                 {
+                    InitUtilization();
+                    InitVolume(node);
+
                     MFSSettings.SaveOverrideList(part, node.GetNodes("TANK"));
                     ParseBaseMass(node);
                     ParseBaseCost(node);
                     ParseInsulationFactor(node);
-                    typesAvailable = node.GetValues("typeAvailable");
+                    typesAvailable.AddRange(node.GetValues("typeAvailable"));
+                    if (typesAvailable.Count() > 0 && !typesAvailable.Contains(type))
+                        typesAvailable.Add(type);
                     RecordManagedResources();
                 }
                 else if (isEditorOrFlight)
@@ -274,6 +286,9 @@ namespace ModularFuelSystem.Tanks
                     // The amounts initialized flag is there so that the tank type loading doesn't
                     // try to set up any resources. They'll get loaded directly from the save.
                     UpdateTankType(false);
+
+                    InitUtilization();
+                    InitVolume(node);
 
                     CleanResources();
 
@@ -295,6 +310,7 @@ namespace ModularFuelSystem.Tanks
                     massDirty = true;
                     CalculateMass();
                 }
+                OnLoadRF(node);
             }
         }
 
@@ -336,7 +352,7 @@ namespace ModularFuelSystem.Tanks
 			return String.Format ("Max Volume: {0}, {1}{2}",
 							KSPUtil.PrintSI (volume, MFSSettings.unitLabel),
 							type,
-							(typesAvailable != null && typesAvailable.Length > 1) ? "*" : "");
+							(typesAvailable != null && typesAvailable.Count() > 1) ? "*" : "");
 		}
 
 		public Callback<Rect> GetDrawModulePanelCallback ()
@@ -412,6 +428,7 @@ namespace ModularFuelSystem.Tanks
 			GameEvents.onPartRemove.Remove (onPartRemove);
 			GameEvents.onEditorShipModified.Remove (onEditorShipModified);
 			GameEvents.onPartActionUIDismiss.Remove (OnPartActionGuiDismiss);
+            TankWindow.HideGUI();
 			TankWindow.OnActionGroupEditorOpened.Remove (OnActionGroupEditorOpened);
 			TankWindow.OnActionGroupEditorClosed.Remove (OnActionGroupEditorClosed);
 		}
@@ -521,7 +538,7 @@ namespace ModularFuelSystem.Tanks
 		public string type = "Default";
 		private string oldType;
 
-		public string[] typesAvailable;
+		public List<string> typesAvailable = new List<string>(); 
 
 		// for EngineIgnitor integration: store a public list of the fuel tanks, and
 		[NonSerialized]
@@ -529,7 +546,8 @@ namespace ModularFuelSystem.Tanks
 
 		private void InitializeTankType ()
 		{
-			if (typesAvailable == null || typesAvailable.Length <= 1) {
+            Fields["type"].guiActiveEditor = true;
+            if (typesAvailable == null || typesAvailable.Count() <= 1) {
 				Fields["type"].guiActiveEditor = false;
 			} else {
                 List<string> typesTech = new List<string>();
@@ -556,7 +574,6 @@ namespace ModularFuelSystem.Tanks
                 else
                     Fields["type"].guiActiveEditor = false;
 			}
-
 			UpdateTankType ();
 		}
 
@@ -586,7 +603,7 @@ namespace ModularFuelSystem.Tanks
                 // else find one that does work
                 if (typesAvailable != null)
                 {
-                    for (int i = 0; i < typesAvailable.Length; i++)
+                    for (int i = 0; i < typesAvailable.Count(); i++)
                     {
                         string tn = typesAvailable[i];
                         TankDefinition newDef = MFSSettings.tankDefinitions.Contains(tn) ? MFSSettings.tankDefinitions[tn] : null;
