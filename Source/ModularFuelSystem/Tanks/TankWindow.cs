@@ -346,7 +346,7 @@ namespace ModularFuelSystem.Tanks
 				tank.maxAmountExpression = tank.maxAmount.ToString ();
 				GameEvents.onEditorShipModified.Fire (EditorLogic.fetch.ship);
                 tank_module.MarkWindowDirty();
-				//Debug.LogWarning ("[MFT] Adding tank " + tank.name + " maxAmount: " + tank.maxAmountExpression ?? "null");
+				log.dbg("Adding tank {0} maxAmount: {1}", tank.name, tank.maxAmountExpression);
 			}
 		}
 
@@ -422,6 +422,16 @@ namespace ModularFuelSystem.Tanks
 			}
         }
         
-		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<TankWindow>(true);
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<TankWindow>(true);
+        static TankWindow()
+        {
+            log.level =
+#if DEBUG
+                KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+            ;
+        }
     }
 }

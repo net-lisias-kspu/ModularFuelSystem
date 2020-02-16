@@ -61,7 +61,7 @@ namespace ModularFuelSystem.Tanks
                 if (unmanagedResources.Count == 0)
                 {
                     unmanagedResources = ((ModuleFuelTanks)part.partInfo.partPrefab.Modules["ModuleFuelTanks"]).unmanagedResources;
-                    //Debug.Log("[ModuleFuelTanks.OnAwake()] unmanagedResources was initialized with count = " + unmanagedResources.Count.ToString());
+                    log.dbg(".OnAwake() : unmanagedResources was initialized with count = " + unmanagedResources.Count.ToString());
                 }
             }
         }
@@ -156,7 +156,7 @@ namespace ModularFuelSystem.Tanks
 
 		public override void OnCopy (PartModule fromModule)
 		{
-			//Debug.Log ($"[ModuleFuelTanks] OnCopy: {fromModule}");
+			log.dbg(".OnCopy : {0}", fromModule);
 
 			var prefab = fromModule as ModuleFuelTanks;
 			utilization = prefab.utilization;
@@ -168,7 +168,7 @@ namespace ModularFuelSystem.Tanks
 			tankList.Clear ();
 			for (int i = 0; i < prefab.tankList.Count; i++) {
 				var tank = prefab.tankList[i];
-				//Debug.Log ($"    {tank.name} {tank.amount} {tank.maxAmount}");
+				log.dbg("    {0} {1} {2}", tank.name, tank.amount, tank.maxAmount);
 				tankList.Add (tank.CreateCopy (this, null, false));
 				tankList[i].maxAmount = tank.maxAmount;
 				tankList[i].amount = tank.amount;
@@ -207,7 +207,7 @@ namespace ModularFuelSystem.Tanks
                 }
 
                 ConfigNode[] unmanagedResourceNodes = node.GetNodes("UNMANAGED_RESOURCE");
-                //Debug.Log("[ModuleFuelTanks.OnLoad()] " + unmanagedResourceNodes.Count() + " UNMANAGED_RESOURCE nodes found");
+                log.dbg(".OnLoad: {0} UNMANAGED_RESOURCE nodes found", unmanagedResourceNodes.Count());
                 for (int i = unmanagedResourceNodes.Count() - 1; i >= 0; --i)
                 {
                     string name = "";
@@ -216,13 +216,13 @@ namespace ModularFuelSystem.Tanks
                     // we're going to be strict and demand all of these be present
                     if (!unmanagedResourceNodes[i].HasValue("name") || !unmanagedResourceNodes[i].HasValue("amount") || !unmanagedResourceNodes[i].HasValue("maxAmount"))
                     {
-                        Debug.Log("[ModuleFuelTanks.OnLoad()] was missing either name, amount or maxAmount for UNMANAGED_RESOURCE: " + name);
+                        log.warn(".OnLoad : was missing either name, amount or maxAmount for UNMANAGED_RESOURCE: {0}", unmanagedResourceNodes[i]);
                         continue;
                     }
                     name = unmanagedResourceNodes[i].GetValue("name");
                     if (PartResourceLibrary.Instance.GetDefinition(name) == null)
                     {
-                        Debug.Log("[ModuleFuelTanks.OnLoad()] could not find resource by the name of " + name);
+                        log.dbg(".OnLoad : could not find resource by the name of {0}", name);
                         continue;
                     }
                     double.TryParse(unmanagedResourceNodes[i].GetValue("amount"), out amount);
@@ -234,7 +234,7 @@ namespace ModularFuelSystem.Tanks
                         if (maxAmount > 0)
                         {
                             unmanagedResources.Add(name, new UnmanagedResource(name, amount, maxAmount));
-                            Debug.Log("[ModuleFuelTanks.OnLoad()] added new UnmanagedResource " + name + " with " + amount + "/" + maxAmount);
+                            log.dbg(".OnLoad : added new UnmanagedResource {0} with {1}/{2}", name, amount, maxAmount);
                             if (!part.Resources.Contains(name))
                             {
                                 ConfigNode resNode = new ConfigNode("RESOURCE");
@@ -245,7 +245,7 @@ namespace ModularFuelSystem.Tanks
                             }
                         }
                         else
-                            Debug.Log("[ModuleFuelTanks.OnLoad()] did not add new UnmanagedResource; maxAmount = 0");
+                            log.info(".OnLoad : did not add new UnmanagedResource; maxAmount = 0");
                     }
                     else
                     {
@@ -253,14 +253,13 @@ namespace ModularFuelSystem.Tanks
                         {
                             unmanagedResources[name].amount += amount;
                             unmanagedResources[name].maxAmount += maxAmount;
-                            //Debug.Log("[ModuleFuelTanks.OnLoad()] modified UnmanagedResource: " + name + "; amount = " + amount + " / maxAmount = " + maxAmount);
-
+                            log.dbg(".OnLoad : modified UnmanagedResource {0} with {1}/{2}", name, amount, maxAmount);
                             // this should be safe; if we're here then we previously would have added this resource if missing.
                             part.Resources[name].amount = Math.Max(part.Resources[name].amount, unmanagedResources[name].amount);
                             part.Resources[name].maxAmount = Math.Max(part.Resources[name].maxAmount, unmanagedResources[name].maxAmount);
                         }
                         else
-                            Debug.Log("[ModuleFuelTanks.OnLoad()] did not add new UnmanagedResource; maxAmount = 0");
+                            log.dbg(".OnLoad : did not add new UnmanagedResource; maxAmount = 0");
                     }
                 }
 
@@ -747,7 +746,7 @@ namespace ModularFuelSystem.Tanks
             {
                 totalVolume = newTotalVolume;
                 volume = newVolume;
-                Debug.LogWarning("[ModularFuelTanks] caught DIV/0 in ChangeTotalVolume. Setting volume/totalVolume and exiting function");
+                log.warn("caught DIV/0 in ChangeTotalVolume. Setting volume/totalVolume and exiting function");
                 return;
             }
 			double volumeRatio = newVolume / volume;
@@ -1219,6 +1218,16 @@ namespace ModularFuelSystem.Tanks
 
         #endregion
 
-		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<ModuleFuelTanks>(true);
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<ModuleFuelTanks>(true);
+        static ModuleFuelTanks()
+        {
+            log.level =
+#if DEBUG
+                KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+            ;
+        }
     }
 }

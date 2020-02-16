@@ -5,7 +5,7 @@ namespace ModularFuelSystem
     public class TweakScaleModularFuelTanksUpdater : IRescalable<ModularFuelSystem.Tanks.ModuleFuelTanks>
     {
 		private ModularFuelSystem.Tanks.ModuleFuelTanks Module { get; }
-		private Part Part => Module.part;
+		//private Part Part => Module.part;
 
 		public TweakScaleModularFuelTanksUpdater(ModularFuelSystem.Tanks.ModuleFuelTanks pm)
         {

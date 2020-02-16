@@ -66,6 +66,17 @@ namespace ModularFuelSystem.Tanks
                     this[i].maxAmount = 0;
             }
         }
-		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelTankList>(true);
-	}
+
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelTankList>(true);
+        static FuelTankList()
+        {
+            log.level =
+#if DEBUG
+                KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+            ;
+        }
+    }
 }

@@ -9,8 +9,7 @@ namespace ModularFuelTanks
 	{
         private void Start()
         {
-            Log.init();
-            Log.force("Version {0}", Version.Text);
+            log.force("Version {0}", Version.Text);
 
             try
             {
@@ -19,9 +18,21 @@ namespace ModularFuelTanks
             }
             catch (KSPe.Util.InstallmentException e)
             {
-                Log.error(e.ToShortMessage());
+                log.error(e.ToShortMessage());
                 KSPe.Common.Dialogs.ShowStopperAlertBox.Show(e);
             }
         }
-	}
+
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<Startup>(true);
+        static Startup()
+        {
+            log.level =
+#if DEBUG
+                    KSPe.Util.Log.Level.TRACE
+#else
+                    KSPe.Util.Log.Level.INFO
+#endif
+                ;
+        }
+    }
 }

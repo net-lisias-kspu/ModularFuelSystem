@@ -342,7 +342,7 @@ namespace ModularFuelSystem.Tanks
 
 		void AddTank (double value)
 		{
-            //Debug.LogWarning ("[MFT] Adding tank from API " + name + " amount: " + value);
+            log.dbg("Adding tank from API {0} amount: {1}", name, value);
             // The following is for unmanaged resource; if such a resource is defined then we probably shouldn't be here....
             ModuleFuelTanks.UnmanagedResource unmanagedResource = null;
             double unmanagedAmount = 0;
@@ -372,7 +372,7 @@ namespace ModularFuelSystem.Tanks
 			res.hideFlow = false;
 			res._flowMode = PartResource.FlowMode.Both;
 			part.Resources.dict.Add (resDef.id, res);
-			//Debug.Log ($"[MFT] AddTank {res.resourceName} {res.amount} {res.maxAmount} {res.flowState} {res.isTweakable} {res.isVisible} {res.hideFlow} {res.flowMode}");
+			log.dbg("AddTank {0} {1} {2} {3} {4} {5} {6} {7}", res.resourceName, res.amount, res.maxAmount, res.flowState, res.isTweakable, res.isVisible, res.hideFlow, res.flowMode);
 
 			module.RaiseResourceListChanged ();
 
@@ -577,6 +577,16 @@ namespace ModularFuelSystem.Tanks
                 density = 0d;
         }
         
-		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelTank>(true);
-	}
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelTank>(true);
+        static FuelTank()
+        {
+            log.level =
+#if DEBUG
+                KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+            ;
+        }
+    }
 }

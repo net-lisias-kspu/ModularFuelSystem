@@ -64,6 +64,16 @@ namespace ModularFuelSystem.Tanks
 			names = "Used by: " + title;
 		}
         
-		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelInfo>(true);
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<FuelInfo>(true);
+		static FuelInfo()
+		{
+			log.level =
+#if DEBUG
+				KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+			;
+		}
 	}
 }

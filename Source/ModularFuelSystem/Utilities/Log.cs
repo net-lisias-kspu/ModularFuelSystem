@@ -10,7 +10,7 @@ namespace ModularFuelSystem
 {
     internal static class Log
     {
-        private static readonly Logger log = Logger.CreateForType<Startup>();
+        private static readonly Logger log = Logger.CreateForType<ModularFuelTanks.Startup>();
 
         internal static void init()
         {

@@ -150,6 +150,16 @@ namespace ModularFuelSystem
             }
         }
         
-		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<RefuelingPump>(true);
+        private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<RefuelingPump>(true);
+        static RefuelingPump()
+        {
+            log.level =
+#if DEBUG
+                KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+            ;
+        }
     }
 }
