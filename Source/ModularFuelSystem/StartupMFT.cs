@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-using ModularFuelSystem;
-
 namespace ModularFuelTanks
 {
     [KSPAddon(KSPAddon.Startup.Instantly, true)]

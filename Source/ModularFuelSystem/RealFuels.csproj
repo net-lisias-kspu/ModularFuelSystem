@@ -78,13 +78,13 @@
     <Compile Include="Properties\Configuration.cs">
       <DependentUpon>Configuration.tt</DependentUpon>
     </Compile>
-    <Compile Include="Startup.cs" />
     <Compile Include="assembly\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>
     <Compile Include="assembly\AssemblyInfoRF.cs">
       <Link>Properties\AssemblyInfoRF.cs</Link>
     </Compile>
+    <Compile Include="StartupRF.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

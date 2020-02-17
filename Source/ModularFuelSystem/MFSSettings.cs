@@ -36,7 +36,7 @@ namespace ModularFuelSystem
 
 			Assembly asm = Assembly.GetCallingAssembly ();
 			string title = MFSVersionReport.GetAssemblyTitle (asm);
-            version = title + " " + ModularFuelTanks.Version.Text;
+            version = title + " " + Version.Text;
 
             return version;
         }

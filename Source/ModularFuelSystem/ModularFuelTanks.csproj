@@ -60,16 +60,16 @@
     <Compile Include="Pumps\RefuelingPump.cs" />
     <Compile Include="Utilities\Styles.cs" />
     <Compile Include="EditorToolbar.cs" />
-    <Compile Include="Properties\VersionMFT.cs">
-      <DependentUpon>VersionMFT.tt</DependentUpon>
-    </Compile>
     <Compile Include="assembly\AssemblyInfoMFT.cs">
       <Link>Properties\AssemblyInfoMFT.cs</Link>
     </Compile>
     <Compile Include="Properties\Configuration.cs">
       <DependentUpon>Configuration.tt</DependentUpon>
     </Compile>
-    <Compile Include="Startup.cs" />
+    <Compile Include="Properties\VersionMFT.cs">
+      <DependentUpon>VersionMFT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StartupMFT.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
