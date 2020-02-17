@@ -79,7 +79,6 @@
       <DependentUpon>Configuration.tt</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <Compile Include="Utilities\Log.cs" />
     <Compile Include="assembly\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>

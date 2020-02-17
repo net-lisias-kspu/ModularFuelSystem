@@ -147,7 +147,7 @@ namespace ModularFuelSystem.Tanks
             }
             catch (Exception e)
             {
-                Debug.LogWarning("[RealFuels.IsProcedural() exception]: \n" + e.Message);
+                log.error(".IsProcedural() exception : {0}", e.Message);
                 return false;
             }
         }
@@ -221,12 +221,12 @@ namespace ModularFuelSystem.Tanks
                     }
                 }
                 double num20 = Math.Max(0.0, Math.Min(val4, val3));
-                log.dbg("part.ptd.skinInteralConductionFlux = {0}", part.ptd.skinInteralConductionFlux.ToString("F16"));
-                log.dbg("num15                 = {0}", num15.ToString("F16"));
-                log.dbg("num20 (unknownFactor) = {0}", num20.ToString("F16"));
-                log.dbg("num14                 = {0}", num14.ToString("F16"));
+                log.dbg("part.ptd.skinInteralConductionFlux = {0:0.0000000000000000}", part.ptd.skinInteralConductionFlux);
+                log.dbg("num15                 = {0:0.0000000000000000}", num15);
+                log.dbg("num20 (unknownFactor) = {0:0.0000000000000000}", num20);
+                log.dbg("num14                 = {0:0.0000000000000000}", num14);
             }
-            //Debug.Log("part.skinInteralConductionFlux = " + part.ptd.skinInteralConductionFlux.ToString("F16"));
+            log.dbg("part.skinInteralConductionFlux = {0:0.0000000000000000}", part.ptd.skinInteralConductionFlux);
         }
 
         partial void CalculateMassRF(ref double mass)
@@ -596,8 +596,8 @@ namespace ModularFuelSystem.Tanks
                 totalTankArea += part.DragCubes.WeightedArea[i];
             }
 #if DEBUG
-            log.info("[ModularFuelSystem.ModuleFuelTankRF] Part WeightedArea: {0} = {1}", part.name, totalTankArea.ToString("F2"));
-            log.info("[ModularFuelSystem.ModuleFuelTankRF] Part Area: {0} = {1}", part.name, part.DragCubes.Area.ToString("F2"));
+            log.info("Part WeightedArea: {0} = {1:0.00}", part.name, totalTankArea);
+            log.info("Part Area: {0} = {1:0.00}", part.name, part.DragCubes.Area);
 #endif
             // This allows a rough guess as to individual tank surface area based on ratio of tank volume to total volume but it breaks down at very small fractions
             // So use greater of spherical calculation and tank ratio of total area.
@@ -607,7 +607,7 @@ namespace ModularFuelSystem.Tanks
             double tempTotal = 0;
 
             if (RFSettings.Instance.debugBoilOff)
-                Debug.Log("[RealFuels.ModuleFuelTankRF] Initializing " + part.name + ".totalTankArea as " + totalTankArea.ToString());
+                log.info("Initializing {0}.totalTankArea as {1}", part.name, totalTankArea);
 
             for (int i = tankList.Count - 1; i >= 0; --i)
             {
@@ -630,7 +630,7 @@ namespace ModularFuelSystem.Tanks
                         log.detail("{0}.maxAmount = {1}", tank.name, tankMaxAmount);
                         log.detail("{0}.totalTankArea = {1}", part.name, totalTankArea);
                         log.detail("Tank surface area = {0}", tank.totalArea);
-                        log.dbg("tank Dewar status = {0}", tank.isDewar.ToString());
+                        log.dbg("tank Dewar status = {0}", tank.isDewar);
                     }
                 }
             }
@@ -638,8 +638,8 @@ namespace ModularFuelSystem.Tanks
                 totalTankArea = tempTotal;
             if (RFSettings.Instance.debugBoilOff)
             {
-                Debug.Log("[RealFuels.ModuleFuelTankRF] " + part.name + ".totalTankArea = " + totalTankArea.ToString());
-                Debug.Log("[RealFuels.ModuleFuelTankRF] " + part.name + ".GetModuleSize()" + part.GetModuleSize(Vector3.zero).ToString("F2"));
+                log.info("{0}.totalTankArea = {1}", part.name, totalTankArea);
+                log.info("{0}.GetModuleSize() = {1:0.00}" + part.name, part.GetModuleSize(Vector3.zero));
             }
         }
 
@@ -653,7 +653,7 @@ namespace ModularFuelSystem.Tanks
 
         public void OnEditorShipModified(ShipConstruct ship)
         {
-            //Debug.Log("ModuleFuelTanksRF.OnEditorShipModified()");
+            log.dbg("ModuleFuelTanksRF.OnEditorShipModified()");
             CalculateTankArea();
         }
 

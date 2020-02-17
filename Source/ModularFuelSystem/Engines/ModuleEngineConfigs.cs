@@ -861,14 +861,14 @@ namespace ModularFuelSystem
             }
             else
             {
-                Debug.LogWarning("*RFMEC* WARNING could not find configuration of name " + configuration + " for part " + part.name + ": Attempting to locate fallback configuration.");
+                log.warn("Could not find configuration of name {0} for part {1}: Attempting to locate fallback configuration.", configuration, part.name);
                 if (configs.Count > 0)
                 {
                     configuration = configs[0].GetValue("name");
                     SetConfiguration();
                 }
                 else
-                    Debug.LogError("*RFMEC* ERROR unable to locate any fallbacks for configuration " + configuration + ",\n Current nodes:" + Utilities.PrintConfigs(configs));
+                    log.error("Unable to locate any fallbacks for configuration {0},\n Current nodes: {1}", configuration, Utilities.PrintConfigs(configs));
             }
 
             StopFX();

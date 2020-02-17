@@ -126,5 +126,15 @@ namespace ModularFuelSystem.Ullage
         }
 
 		private static readonly KSPe.Util.Log.Logger log = KSPe.Util.Log.Logger.CreateForType<UllageModule>(true);
+        static UllageModule()
+        {
+            log.level =
+#if DEBUG
+                KSPe.Util.Log.Level.TRACE
+#else
+                KSPe.Util.Log.Level.INFO
+#endif
+                ;
+        }
     }
 }
