@@ -1,5 +1,20 @@
 # Modular Fuel System :: Change Log
 
+* 2020-0216: MFT 5.13.0.1 ; RF 12.8.4.2 (Lisias) for KSP >= 1.4
+	+ Added KSPe facilities
+		- Log
+		- Installment check 
+	+ Syncing with upstream:
+		- Respecting Show/Hide UI
+		- Updating resources manipulation (originally for KSP 1.6, working on 1.4 too)
+		- Tank cloning works now
+		- Fixing loading of crafts
+		- Unmanaged resources management
+		- Stock tanks support updated
+			- Bi/tri/Quad adapters are tankable now
+		- Various fixes and optimizations.
+		- Supporting PARTUPGRADE
+		- Addded MLI Tech for RF
 * 2019-0122: MFT 5.11.2.1 ; RF 12.7.4.1 (Lisias) for KSP >= 1.4
 	+ Syncing with upstream:
 		-  Analytic thermal improvements:
