@@ -58,9 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModularFuelSystem\RealFuels.csproj">
-      <Project>{0041813d-dcd1-4ac7-8327-85765bf924a3}</Project>
+      <Project>{0041813D-DCD1-4AC7-8327-85765BF924A3}</Project>
       <Name>RealFuels</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

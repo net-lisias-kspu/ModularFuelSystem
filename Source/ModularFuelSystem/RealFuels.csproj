@@ -12,6 +12,39 @@
     <TargetFrameworkProfile />
     <ReleaseVersion>10.8.0</ReleaseVersion>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.14x|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;REALFUELS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.14x|AnyCPU' ">
+    <Optimize>True</Optimize>
+    <OutputPath>..\..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <DefineConstants>REALFUELS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.15x|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;REALFUELS;KSP150</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.15x|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DefineConstants>REALFUELS;KSP150</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
       <Private>False</Private>
@@ -81,9 +114,6 @@
     <Compile Include="assembly\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>
-    <Compile Include="assembly\AssemblyInfoRF.cs">
-      <Link>Properties\AssemblyInfoRF.cs</Link>
-    </Compile>
     <Compile Include="StartupRF.cs" />
   </ItemGroup>
   <ItemGroup />
@@ -98,38 +128,5 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent></PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.14x|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>..\..\bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;REALFUELS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.14x|AnyCPU' ">
-    <Optimize>True</Optimize>
-    <OutputPath>..\..\bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-    <DefineConstants>REALFUELS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.15x|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;REALFUELS;KSP150</DefineConstants>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.15x|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DefineConstants>REALFUELS;KSP150</DefineConstants>
   </PropertyGroup>
 </Project>

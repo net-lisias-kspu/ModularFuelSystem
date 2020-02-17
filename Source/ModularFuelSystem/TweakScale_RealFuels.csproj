@@ -11,6 +11,24 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <ReleaseVersion>10.8.0</ReleaseVersion>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>..\..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="tweakscale\TweakScale_ModularEngines.cs" />
@@ -38,7 +56,6 @@
     <ProjectReference Include="RealFuels.csproj">
       <Project>{0041813D-DCD1-4AC7-8327-85765BF924A3}</Project>
       <Name>RealFuels</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
