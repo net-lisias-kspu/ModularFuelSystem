@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using UnityEngine;
 
 /* Sim code largely based on that of EngineIgnitor by HoneyFox (MIT license), just tweaked for

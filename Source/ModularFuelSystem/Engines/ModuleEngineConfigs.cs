@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Linq;
+
 using UnityEngine;
-using KSP;
-using Debug = UnityEngine.Debug;
-using ModularFuelSystem.TechLevels;
-using SolverEngines;
+
 using KSP.UI.Screens;
+
+using ModularFuelSystem.TechLevels;
 
 namespace ModularFuelSystem
 {
