@@ -40,18 +40,22 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Scale_Redist">
       <HintPath>..\..\..\..\..\..\LIB\plugins\Scale_Redist.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="ModularFuelTanks.csproj">
       <Project>{9EA86296-8342-4112-81F3-438C9333E284}</Project>
       <Name>ModularFuelTanks</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -7,12 +7,12 @@ namespace RealFuels
 	{
         private void Start()
         {
-            log.force("Version {0}", ModularFuelSystem.Version.Text);
+            log.force("Version {0}", Version.Text);
 
             try
             {
-                KSPe.Util.Compatibility.Check<Startup>(typeof(ModularFuelSystem.Version), typeof(ModularFuelTanks.Configuration)); // Gambiarra pra não precisar criar outro template.
-                KSPe.Util.Installation.Check<Startup>(typeof(ModularFuelSystem.Version));
+                KSPe.Util.Compatibility.Check<Startup>(typeof(Version), typeof(Configuration)); // Gambiarra pra não precisar criar outro template.
+                KSPe.Util.Installation.Check<Startup>(typeof(Version));
             }
             catch (KSPe.Util.InstallmentException e)
             {

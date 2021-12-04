@@ -51,24 +51,31 @@
     </Reference>
     <Reference Include="KSPe">
       <HintPath>..\..\..\..\..\..\LIB\plugins\KSPe.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ModularFlightIntegrator">
       <HintPath>..\..\..\..\..\..\LIB\plugins\ModularFlightIntegrator.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SolverEngines">
       <HintPath>..\..\..\..\..\..\LIB\plugins\SolverEngines.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\..\runtime\1.4.1\KSP.app\Contents\Resources\Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="KSPe.UI">
       <HintPath>..\..\..\..\..\..\LIB\plugins\KSPe.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\LIB\managed\1.5.0\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\LIB\managed\1.5.0\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\..\LIB\managed\1.5.0\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -83,45 +90,73 @@
     <Compile Include="EntryCosts\UpgradeManager.cs" />
     <Compile Include="EntryCosts\EntryCostDatabase.cs" />
     <Compile Include="EntryCosts\PartEntryCostHolder.cs" />
-    <Compile Include="Pumps\RefuelingPump.cs" />
     <Compile Include="Tanks\EditorCrossfeedSetMaintainer.cs" />
-    <Compile Include="Tanks\FuelInfo.cs" />
-    <Compile Include="Tanks\FuelTank.cs" />
-    <Compile Include="Tanks\FuelTankList.cs" />
-    <Compile Include="Tanks\ModuleFuelTanks.cs" />
     <Compile Include="Tanks\ModuleFuelTanksRF.cs" />
     <Compile Include="Tanks\ModuleFuelTanksTestFlight.cs" />
-    <Compile Include="Tanks\TankDefinition.cs" />
-    <Compile Include="Tanks\TankDefinitionList.cs" />
-    <Compile Include="Tanks\TankWindow.cs" />
     <Compile Include="TechLevels\TechLevel.cs" />
     <Compile Include="Ullage\UllageModule.cs" />
     <Compile Include="Ullage\UllageSet.cs" />
     <Compile Include="Ullage\UllageSimulator.cs" />
     <Compile Include="Utilities\TestFlightWrapper.cs" />
     <Compile Include="Utilities\Utilities.cs" />
-    <Compile Include="Utilities\Styles.cs" />
-    <Compile Include="MFSSettings.cs" />
-    <Compile Include="Properties\VersionRF.cs">
-      <DependentUpon>VersionRF.tt</DependentUpon>
+    <Compile Include="Properties\Version.cs">
+      <DependentUpon>Version.tt</DependentUpon>
     </Compile>
-    <Compile Include="assembly\AssemblyInfoRF.cs">
-      <Link>Properties\AssemblyInfoRF.cs</Link>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Startup.cs" />
     <Compile Include="Properties\Configuration.cs">
       <DependentUpon>Configuration.tt</DependentUpon>
     </Compile>
-    <Compile Include="assembly\VersionReport.cs">
+    <Compile Include="..\ModularFuelSystem\Properties\VersionReport.cs">
       <Link>Properties\VersionReport.cs</Link>
     </Compile>
-    <Compile Include="StartupRF.cs" />
+    <Compile Include="..\ModularFuelSystem\Pumps\RefuelingPump.cs">
+      <Link>Pumps\RefuelingPump.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\MFSSettings.cs">
+      <Link>MFSSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Utilities\Styles.cs">
+      <Link>Utilities\Styles.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\TankWindow.cs">
+      <Link>Tanks\TankWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\FuelInfo.cs">
+      <Link>Tanks\FuelInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\FuelTank.cs">
+      <Link>Tanks\FuelTank.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\FuelTankList.cs">
+      <Link>Tanks\FuelTankList.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\ModuleFuelTanks.cs">
+      <Link>Tanks\ModuleFuelTanks.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\TankDefinition.cs">
+      <Link>Tanks\TankDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\ModularFuelSystem\Tanks\TankDefinitionList.cs">
+      <Link>Tanks\TankDefinitionList.cs</Link>
+    </Compile>
+    <Compile Include="MFSSettingsRF.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Properties\VersionRF.tt">
+    <None Include="Properties\Version.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>VersionRF.cs</LastGenOutput>
+      <LastGenOutput>Version.cs</LastGenOutput>
     </None>
+    <None Include="Properties\Configuration.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Configuration.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pumps\" />
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent></PreBuildEvent>

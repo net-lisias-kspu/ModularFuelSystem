@@ -74,7 +74,7 @@
 #>
 
 // Automatically generated code. Any changes will be lost!
-namespace ModularFuelSystem
+namespace <#= PROJECT_NAME #>
 {
 	public static class Version
 	{

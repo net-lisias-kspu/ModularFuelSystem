@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ModularFuelSystem
 {
 	[KSPAddon (KSPAddon.Startup.Instantly, false)]
-    public class MFSSettings : MonoBehaviour
+    public partial class MFSSettings : MonoBehaviour
 	{
         public static bool useRealisticMass = true;
         public static float tankMassMultiplier = 1;
@@ -36,7 +36,7 @@ namespace ModularFuelSystem
 
 			Assembly asm = Assembly.GetCallingAssembly ();
 			string title = MFSVersionReport.GetAssemblyTitle (asm);
-            version = title + " " + ModularFuelTanks.Version.Text;
+			version = title + " " + ModuleVersion;
 
             return version;
         }

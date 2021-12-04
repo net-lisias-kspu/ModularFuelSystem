@@ -35,21 +35,27 @@
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TestFlight">
       <HintPath>..\..\..\..\..\..\LIB\plugins\TestFlight.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TestFlightAPI">
       <HintPath>..\..\..\..\..\..\LIB\plugins\TestFlightAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\..\..\..\LIB\managed\1.4.1\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -57,9 +63,10 @@
     <Compile Include="TestFlightRealFuels.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ModularFuelSystem\RealFuels.csproj">
+    <ProjectReference Include="..\RealFuels\RealFuels.csproj">
       <Project>{0041813D-DCD1-4AC7-8327-85765BF924A3}</Project>
       <Name>RealFuels</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
