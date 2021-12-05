@@ -8,7 +8,7 @@
     <BaseIntermediateOutputPath>..\..\obj\RealFuels</BaseIntermediateOutputPath>
     <RootNamespace>RealFuels</RootNamespace>
     <AssemblyName>TweakScale_RealFuels</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <ReleaseVersion>10.8.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

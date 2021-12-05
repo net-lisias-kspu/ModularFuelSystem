@@ -24,7 +24,7 @@ namespace ModularFuelSystem
 
         public double configCostToScienceMultiplier = 0.1d;
 
-        public double varyThrust = 0d;
+        public double varianceAndResiduals = 0d;
 
         public bool usePartNameInConfigUnlock = true;
 
@@ -126,7 +126,7 @@ namespace ModularFuelSystem
             node.TryGetValue("engineMassMultiplier", ref engineMassMultiplier);
             node.TryGetValue("heatMultiplier", ref heatMultiplier);
             node.TryGetValue("useRealisticMass", ref useRealisticMass);
-            node.TryGetValue("varyThrust", ref varyThrust);
+            node.TryGetValue("varianceAndResiduals", ref varianceAndResiduals);
 
             if (node.HasNode("RF_TECHLEVELS"))
                 techLevels = node.GetNode("RF_TECHLEVELS");

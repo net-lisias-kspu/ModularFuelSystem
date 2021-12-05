@@ -7,24 +7,15 @@ namespace ModularFuelSystem.Ullage
 {
     public class UllageModule : VesselModule
     {
-        List<UllageSet> ullageSets;
-        List<Tanks.ModuleFuelTanks> tanks;
+        private readonly List<UllageSet> ullageSets = new List<UllageSet>();
+        private readonly List<Tanks.ModuleFuelTanks> tanks = new List<Tanks.ModuleFuelTanks>();
 
         bool packed = true;
         int partCount = -1;
 
-        protected override void OnStart()
-        {
-            base.OnStart();
-
-            ullageSets = new List<UllageSet>();
-            tanks = new List<Tanks.ModuleFuelTanks>();
-            // will reset on first update
-        }
-
         public void FixedUpdate()
         {
-            if (vessel == null || !FlightGlobals.ready)
+            if (vessel == null || !vessel.loaded || !FlightGlobals.ready)
             {
                 partCount = -1;
                 return;
@@ -48,7 +39,7 @@ namespace ModularFuelSystem.Ullage
             }
             else
             {
-                accel = (Vector3)(vessel.perturbation);
+                accel = vessel.perturbation;
                 angVel = vessel.angularVelocity;
             }
             // are we stopped but the fuel is under gravity?

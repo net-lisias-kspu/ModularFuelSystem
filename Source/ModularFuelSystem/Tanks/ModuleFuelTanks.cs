@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
-
 using UnityEngine;
+using UnityEngine.Events;
+using System.Collections.ObjectModel;
+using System.Reflection;
 
 using KSP.UI.Screens;
 
@@ -33,8 +35,12 @@ namespace ModularFuelSystem.Tanks
 
 		bool compatible = true;
 		bool started;
+        private bool windowDirty = false;
 
         public bool fueledByLaunchClamp = false;
+
+        private const string guiGroupName = "RealFuels";
+        private const string guiGroupDisplayName = "Real Fuels";
 
         private static double MassMult
 		{
@@ -145,9 +151,7 @@ namespace ModularFuelSystem.Tanks
 				if (!tankList.Contains (partResource.resourceName))
 					continue;
 				part.Resources.Remove(partResource.info.id);
-#if KSP150
 				part.SimulationResources.Remove(partResource.info.id);
-#endif
 			}
 			RaiseResourceListChanged ();
 			// Setup the mass
@@ -296,9 +300,7 @@ namespace ModularFuelSystem.Tanks
                         if (!tankList.Contains(partResource.resourceName) && !unmanagedResources.ContainsKey(partResource.resourceName))
                         {
                             part.Resources.Remove(partResource.info.id);
-#if KSP150
                             part.SimulationResources.Remove(partResource.info.id);
-#endif
                         }
                     }
                     RaiseResourceListChanged();
@@ -362,18 +364,6 @@ namespace ModularFuelSystem.Tanks
 			return "Modular Fuel Tank";
 		}
 
-		void OnActionGroupEditorOpened ()
-		{
-			Events["HideUI"].active = false;
-			Events["ShowUI"].active = false;
-		}
-
-		void OnActionGroupEditorClosed ()
-		{
-			Events["HideUI"].active = false;
-			Events["ShowUI"].active = true;
-		}
-
         public void Start() // not just when activated
         {
             if (!compatible) {
@@ -389,18 +379,13 @@ namespace ModularFuelSystem.Tanks
             }
             enabled = true; // just in case...
 
-            Events["HideUI"].active = false;
-            Events["ShowUI"].active = true;
-
-
             if (isEditor)
             {
                 GameEvents.onPartAttach.Add(onPartAttach);
                 GameEvents.onPartRemove.Add(onPartRemove);
                 GameEvents.onEditorShipModified.Add(onEditorShipModified);
                 GameEvents.onPartActionUIDismiss.Add(OnPartActionGuiDismiss);
-                TankWindow.OnActionGroupEditorOpened.Add(OnActionGroupEditorOpened);
-                TankWindow.OnActionGroupEditorClosed.Add(OnActionGroupEditorClosed);
+                GameEvents.onPartActionUIShown.Add(OnPartActionUIShown);
 
                 if (part.symmetryCounterparts.Count > 0) {
                     UpdateTankType(false);
@@ -425,9 +410,8 @@ namespace ModularFuelSystem.Tanks
 			GameEvents.onPartRemove.Remove (onPartRemove);
 			GameEvents.onEditorShipModified.Remove (onEditorShipModified);
 			GameEvents.onPartActionUIDismiss.Remove (OnPartActionGuiDismiss);
+            GameEvents.onPartActionUIShown.Remove(OnPartActionUIShown);
             TankWindow.HideGUI();
-			TankWindow.OnActionGroupEditorOpened.Remove (OnActionGroupEditorOpened);
-			TankWindow.OnActionGroupEditorClosed.Remove (OnActionGroupEditorClosed);
 		}
 
 		public override void OnSave (ConfigNode node)
@@ -503,39 +487,49 @@ namespace ModularFuelSystem.Tanks
 			}
 		}
 
+        private void OnPartActionUIShown(UIPartActionWindow window, Part p)
+        {
+            if (p == part && windowDirty)
+            {
+                windowDirty = false;        // Un-flag state
+                window.displayDirty = true; // Signal refresh
+                //MonoUtilities.RefreshPartContextWindow(part);
+            }
+        }
+
 		private void OnPartActionGuiDismiss(Part p)
 		{
-			if (p == part) {
-				HideUI ();
-			}
+			if (p == part)
+				showUI = false;
 		}
 
 		public void Update ()
 		{
-            if (!compatible || !HighLogic.LoadedSceneIsEditor)
+            if (compatible && HighLogic.LoadedSceneIsEditor)
             {
-				return;
-			}
-			UpdateTankType ();
-			UpdateUtilization ();
-			CalculateMass ();
+                UpdateTankType();
+                UpdateUtilization();
+                CalculateMass();
 
-            bool inEditorActionsScreen = (EditorLogic.fetch?.editorScreen == EditorScreen.Actions);
-            bool partIsSelectedInActionsScreen = inEditorActionsScreen && (EditorActionGroups.Instance?.GetSelectedParts().Contains(part) ?? false);
+                bool inEditorActionsScreen = (EditorLogic.fetch?.editorScreen == EditorScreen.Actions);
+                bool partIsSelectedInActionsScreen = inEditorActionsScreen && (EditorActionGroups.Instance?.GetSelectedParts().Contains(part) ?? false);
 
-            if (partIsSelectedInActionsScreen) {
-				TankWindow.ShowGUI (this);
-			}
-		}
+                if (partIsSelectedInActionsScreen || showUI)
+                    TankWindow.ShowGUI(this);
+                else
+                    TankWindow.HideGUIForModule(this);
+            }
+            UpdateRF();
+        }
 
 		// The active fuel tanks. This will be the list from the tank type, with any overrides from the part file.
 		internal FuelTankList tankList = new FuelTankList ();
 
-		[KSPField (isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "Tank Type"), UI_ChooseOption (scene = UI_Scene.Editor)]
+		[KSPField (isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "Tank Type", groupName = guiGroupName, groupDisplayName = guiGroupDisplayName), UI_ChooseOption (scene = UI_Scene.Editor)]
 		public string type = "Default";
 		private string oldType;
 
-		public List<string> typesAvailable = new List<string>(); 
+		public List<string> typesAvailable = new List<string>();
 
 		// for EngineIgnitor integration: store a public list of the fuel tanks, and
 		[NonSerialized]
@@ -641,9 +635,7 @@ namespace ModularFuelSystem.Tanks
 				if (!managed.Contains(resname) || tankList.Contains(resname) || unmanagedResources.ContainsKey(resname))
 					continue;
 				part.Resources.Remove (partResource.info.id);
-#if KSP150
 				part.SimulationResources.Remove (partResource.info.id);
-#endif
 				needsMesage = true;
 			}
 			if (needsMesage) {
@@ -660,7 +652,7 @@ namespace ModularFuelSystem.Tanks
             if (!isDatabaseLoad) {
                 // being called in the SpaceCenter scene is assumed to be a database reload
                 //FIXME is this really needed?
-                
+
                 massDirty = true;
             }
 
@@ -671,7 +663,7 @@ namespace ModularFuelSystem.Tanks
 		// The total tank volume. This is prior to utilization
 		public double totalVolume;
 
-		[KSPField (isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "Utilization", guiUnits = "%", guiFormat = "F0"),
+		[KSPField (isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "Utilization", guiUnits = "%", guiFormat = "F0", groupName = guiGroupName, groupDisplayName = guiGroupDisplayName),
 		 UI_FloatRange (minValue = 1, maxValue = 100, stepIncrement = 1, scene = UI_Scene.Editor)]
 		public float utilization = -1;
 		private float oldUtilization = -1;
@@ -688,7 +680,7 @@ namespace ModularFuelSystem.Tanks
 		// no double support for KSPFields - [KSPField (isPersistant = true)]
 		public double volume;
 
-		[KSPField (isPersistant = false, guiActive = false, guiActiveEditor = true, guiName = "Volume")]
+		[KSPField (isPersistant = false, guiActive = false, guiActiveEditor = true, guiName = "Volume", groupName = guiGroupName, groupDisplayName = guiGroupDisplayName)]
 		public string volumeDisplay;
 
 		public double UsedVolume
@@ -800,7 +792,7 @@ namespace ModularFuelSystem.Tanks
 		public float mass;
 		internal bool massDirty = true;
 
-		[KSPField (isPersistant = false, guiActive = false, guiActiveEditor = true, guiName = "Mass")]
+		[KSPField (isPersistant = false, guiActive = false, guiActiveEditor = true, guiName = "Mass", groupName = guiGroupName, groupDisplayName = guiGroupDisplayName)]
 		public string massDisplay;
 
 		// public so they copy
@@ -1020,9 +1012,7 @@ namespace ModularFuelSystem.Tanks
 		public void RaiseResourceListChanged ()
 		{
 			GameEvents.onPartResourceListChange.Fire (part);
-#if KSP150
 			part.ResetSimulationResources ();
-#endif
 			part.SendEvent ("OnResourceListChanged", null, 0);
 			MarkWindowDirty();
 		}
@@ -1033,27 +1023,12 @@ namespace ModularFuelSystem.Tanks
 			massDirty = true;
 		}
 
-		[KSPEvent (guiActiveEditor = true, guiName = "Hide Tank UI", active = false)]
-		public void HideUI ()
-		{
-			TankWindow.HideGUI ();
-			UpdateMenus (false);
-		}
+        [KSPField(guiActiveEditor = true, guiName = "Tank UI", groupName = guiGroupName, groupDisplayName = guiGroupDisplayName)]
+        [UI_Toggle(enabledText = "Hide", disabledText = "Show", suppressEditorShipModified = true)]
+        [NonSerialized]
+        public bool showUI;
 
-		[KSPEvent (guiActiveEditor = true, guiName = "Show Tank UI", active = false)]
-		public void ShowUI ()
-		{
-			TankWindow.ShowGUI (this);
-			UpdateMenus (true);
-		}
-
-		void UpdateMenus (bool visible)
-		{
-			Events["HideUI"].active = visible;
-			Events["ShowUI"].active = !visible;
-		}
-
-		[KSPEvent (guiName = "Remove All Tanks", guiActive = false, guiActiveEditor = true, name = "Empty")]
+        [KSPEvent (guiName = "Remove All Tanks", guiActive = false, guiActiveEditor = true, name = "Empty", groupName = guiGroupName, groupDisplayName = guiGroupDisplayName)]
 		public void Empty ()
 		{
 			for (int i = 0; i < tankList.Count; i++) {
@@ -1067,16 +1042,11 @@ namespace ModularFuelSystem.Tanks
 			if (!started) {
 				return;
 			}
-			UIPartActionWindow action_window;
-			if (UIPartActionController.Instance == null) {
-				// no controller means no window to mark dirty
-				return;
-			}
-			action_window = UIPartActionController.Instance.GetItem(part);
-			if (action_window == null) {
-				return;
-			}
-			action_window.displayDirty = true;
+			if (UIPartActionController.Instance?.GetItem(part) is UIPartActionWindow paw)
+				paw.displayDirty = true;
+			else
+				windowDirty = true; // The PAW isn't open, so request refresh later
+			//MonoUtilities.RefreshPartContextWindow(part);
 		}
 
 
@@ -1151,7 +1121,9 @@ namespace ModularFuelSystem.Tanks
 						name = "MFT" + idx++,
 						guiActive = false,
 						guiActiveEditor = activeEditor,
-						guiName = info.Label
+						guiName = info.Label,
+						groupName = guiGroupName,
+						groupDisplayName = guiGroupDisplayName
 					};
 					FuelInfo info1 = info;
 					BaseEvent button = new BaseEvent (Events, kspEvent.name, () => ConfigureFor (info1), kspEvent) {
@@ -1216,6 +1188,7 @@ namespace ModularFuelSystem.Tanks
         partial void GetModuleCostRF(ref double cost);
         partial void CalculateMassRF(ref double mass);
         partial void OnLoadRF(ConfigNode node);
+        partial void UpdateRF();
 
         #endregion
 

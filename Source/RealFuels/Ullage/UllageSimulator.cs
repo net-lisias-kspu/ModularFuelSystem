@@ -36,13 +36,13 @@ namespace ModularFuelSystem.Ullage
         string propellantStatus = "Very Stable";
         double UT = double.MinValue;
 
-        static double veryStable = 0.996d; // will be clamped above this.
-        static double stable = 0.95d;
-        static double risky = 0.75d;
-        static double veryRisky = 0.3d;
-        static double unstable = 0.15d;
+        private const double veryStable = 0.996d; // will be clamped above this.
+        private const double stable = 0.95d;
+        private const double risky = 0.75d;
+        private const double veryRisky = 0.3d;
+        private const double unstable = 0.15d;
 
-        string name = "Unknown";
+        private readonly string name = "Unknown";
 
         public UllageSimulator()
         {
@@ -179,6 +179,8 @@ namespace ModularFuelSystem.Ullage
             log.dbg("Ullage: pHorizontal: " + pHorizontal.ToString("F3"));
 
             propellantStability = Math.Max(0.0d, 1.0d - (pVertical * pHorizontal * (0.75d + Math.Sqrt(bLevel))));
+            if (propellantStability >= veryStable)
+                propellantStability = 1d;
 
 #if DEBUG
 			if (propellantStability < 0.5d)
@@ -188,15 +190,11 @@ namespace ModularFuelSystem.Ullage
 					, deltaTime, utTimeDelta, localAcceleration, rotation, fuelRatio
 				);
 #endif
-            SetStateString();
         }
         private void SetStateString()
         {
             if (propellantStability >= veryStable)
-            {
-                propellantStability = 1d;
                 propellantStatus = "Very Stable";
-            }
             else if (propellantStability >= stable)
                 propellantStatus = "Stable";
             else if (propellantStability >= risky)
@@ -207,17 +205,10 @@ namespace ModularFuelSystem.Ullage
                 propellantStatus = "Unstable";
             else
                 propellantStatus = "Very Unstable";
-            propellantStatus += " (" + propellantStability.ToString("P2") + ")";
+            propellantStatus += $" ({propellantStability:P2})";
         }
-        public double GetPropellantStability()
-        {
-            return propellantStability;
-        }
-        public void SetPropellantStability(double newStab)
-        {
-            propellantStability = newStab;
-            SetStateString();
-        }
+        public double GetPropellantStability() => propellantStability;
+        public void SetPropellantStability(double newStab) => propellantStability = newStab;
         public string GetPropellantStatus(out Color col)
         {
             if (propellantStability >= stable)
@@ -226,7 +217,7 @@ namespace ModularFuelSystem.Ullage
                 col = XKCDColors.KSPNotSoGoodOrange;
             else
                 col = XKCDColors.Red;
-
+            SetStateString();
             return propellantStatus;
         }
         

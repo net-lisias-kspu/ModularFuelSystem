@@ -12,8 +12,18 @@ namespace ModularFuelSystem.Tanks
 		[Persistent]
 		public string baseCost;
 
+        /// <summary>
+        /// Name of the tech node that needs to be unlocked before the current tank definition becomes selectable.
+        /// This field will not be checked if partUpgradeRequired is filled at the same time as this.
+        /// </summary>
         [Persistent]
         public string techRequired = "";
+
+        /// <summary>
+        /// Name of the part upgrade that needs to be unlocked before the current tank definition becomes selectable.
+        /// </summary>
+        [Persistent]
+        public string partUpgradeRequired = "";
 
         [Persistent]
         public bool highlyPressurized = false;
@@ -65,16 +75,27 @@ namespace ModularFuelSystem.Tanks
 		public void Save (ConfigNode node)
 		{
 			ConfigNode.CreateConfigFromObject (this, node);
-			tankList.Save (node);
+			tankList.Save (node, true);
 		}
 
         public bool canHave
         {
             get
             {
-                if (techRequired.Equals("") || HighLogic.CurrentGame == null || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
+                if (HighLogic.CurrentGame == null || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
                     return true;
-                return ResearchAndDevelopment.GetTechnologyState(techRequired) == RDTech.State.Available;
+
+                if (!string.IsNullOrEmpty(partUpgradeRequired) &&
+                    HighLogic.CurrentGame.Parameters.CustomParams<GameParameters.AdvancedParams>().PartUpgradesInCareer)
+                {
+                    return PartUpgradeManager.Handler.IsUnlocked(partUpgradeRequired);
+                }
+                else if (!string.IsNullOrEmpty(techRequired))
+                {
+                    return ResearchAndDevelopment.GetTechnologyState(techRequired) == RDTech.State.Available;
+                }
+
+                return true;
             }
         }
 	}

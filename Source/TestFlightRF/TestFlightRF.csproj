@@ -9,7 +9,7 @@
     <RootNamespace>TestFlightRF</RootNamespace>
     <AssemblyName>TestFlightRF</AssemblyName>
     <ReleaseVersion>10.8.0</ReleaseVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,7 +66,6 @@
     <ProjectReference Include="..\RealFuels\RealFuels.csproj">
       <Project>{0041813D-DCD1-4AC7-8327-85765BF924A3}</Project>
       <Name>RealFuels</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

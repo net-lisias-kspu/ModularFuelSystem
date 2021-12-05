@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using UnityEngine;
 
@@ -6,6 +9,52 @@ namespace ModularFuelSystem
 {
     public class Utilities
     {
+        private static bool? _kerbalismFound = null;
+
+        public static bool KerbalismFound
+        {
+            get
+            {
+                if (!_kerbalismFound.HasValue)
+                {
+                    _kerbalismFound = false;
+                    
+                    foreach (var a in AssemblyLoader.loadedAssemblies)
+                    {
+                        // Kerbalism comes with more than one assembly. There is Kerbalism for debug builds, KerbalismBootLoader,
+                        // then there are Kerbalism18 or Kerbalism16_17 depending on the KSP version, and there might be other
+                        // assemblies like KerbalismContracts etc.
+                        // So look at the assembly name object instead of the assembly name (which is the file name and could be renamed).
+
+                        AssemblyName nameObject = new AssemblyName(a.assembly.FullName);
+                        string realName = nameObject.Name; // Will always return "Kerbalism" as defined in the AssemblyName property of the csproj
+
+                        if (string.Equals(realName, "Kerbalism", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _kerbalismFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                return _kerbalismFound.Value;
+            }
+        }
+
+        private static bool? _b9psFound = null;
+        public static bool B9PSFound
+        {
+            get
+            {
+                if (!_b9psFound.HasValue)
+                {
+                    var assembly = AssemblyLoader.loadedAssemblies.FirstOrDefault(a => a.assembly.GetName().Name == "B9PartSwitch")?.assembly;
+                    _b9psFound = (assembly is Assembly);
+                }
+                return _b9psFound.Value;
+            }
+        }
+
         public static FloatCurve Mod(FloatCurve fc, float sMult, float vMult)
         {
             FloatCurve newCurve = new FloatCurve();
@@ -107,6 +156,26 @@ namespace ModularFuelSystem
                 unit = "J";
             }
             return KSPUtil.PrintSI(flux * 1e3, unit, 4);
+        }
+
+        public static string FormatThrust(double thrust)
+        {
+            if (thrust < 1e-6)
+            {
+                return $"{thrust * 1e9:0.#} μN";
+            }
+            if (thrust < 1e-3)
+            {
+                return $"{thrust * 1e6:0.#} mN";
+            }
+            else if (thrust < 1.0)
+            {
+                return $"{thrust * 1e3:0.#} N";
+            }
+            else
+            {
+                return $"{thrust:0.#} kN";
+            }
         }
 
         #region Finding resources

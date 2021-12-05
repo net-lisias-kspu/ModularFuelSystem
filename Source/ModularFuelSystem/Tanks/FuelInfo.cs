@@ -9,6 +9,7 @@ namespace ModularFuelSystem.Tanks
 	{
 		public string names;
 		public readonly List<Propellant> propellants;
+		public readonly List<double> volumeMults;
 		public readonly double efficiency;
 		public readonly double ratioFactor;
 
@@ -22,12 +23,13 @@ namespace ModularFuelSystem.Tanks
 		{
 			get {
 				string label = "";
-				foreach (Propellant tfuel in propellants) {
+				for (int i = 0; i < propellants.Count; ++i) {
+					Propellant tfuel = propellants[i];
 					if (PartResourceLibrary.Instance.GetDefinition (tfuel.name).resourceTransferMode != ResourceTransferMode.NONE && !IgnoreFuel (tfuel.name)) {
 						if (label.Length > 0) {
 							label += " / ";
 						}
-						label += Math.Round (100000 * tfuel.ratio / ratioFactor, 0)*0.001 + "% " + tfuel.name;
+						label += Math.Round (100000 * tfuel.ratio * volumeMults[i] / efficiency, 0)*0.001 + "% " + tfuel.name;
 					}
 				}
 				return label;
@@ -43,8 +45,10 @@ namespace ModularFuelSystem.Tanks
 			ratioFactor = 0.0;
 			efficiency = 0.0;
 			propellants = props;
+			volumeMults = new List<double>(props.Count);
 
-			foreach (Propellant tfuel in propellants) {
+			for (int i = 0; i < propellants.Count; ++i) {
+				Propellant tfuel = propellants[i];
 				if (PartResourceLibrary.Instance.GetDefinition (tfuel.name) == null) {
 					log.error ("Unknown RESOURCE [{0}]", tfuel.name);
 					ratioFactor = 0.0;
@@ -53,8 +57,10 @@ namespace ModularFuelSystem.Tanks
 				if (PartResourceLibrary.Instance.GetDefinition (tfuel.name).resourceTransferMode != ResourceTransferMode.NONE) {
 					FuelTank t;
 					if (tank.tankList.TryGet (tfuel.name, out t)) {
-						efficiency += tfuel.ratio/t.utilization;
+						double volumeMultiplier = 1d / t.utilization;
+						efficiency += tfuel.ratio * volumeMultiplier;
 						ratioFactor += tfuel.ratio;
+						volumeMults.Add(volumeMultiplier);
 					} else if (!IgnoreFuel (tfuel.name)) {
 						ratioFactor = 0.0;
 						break;

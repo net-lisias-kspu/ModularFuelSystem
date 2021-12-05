@@ -8,19 +8,17 @@ namespace ModularFuelSystem.Tanks
 {
     public partial class ModuleFuelTanks : IAnalyticTemperatureModifier, IAnalyticPreview
     {
+        public const string BoiloffGroupName = "RFBoiloffDebug";
+        public const string BoiloffGroupDisplayName = "RF Boiloff";
         protected double totalTankArea;
-        private double boiloffMass = 0d;
         private double analyticSkinTemp;
         private double analyticInternalTemp;
-        private double previewInternalFluxAdjust;
-        private bool supportsBoiloff = false;
-        public bool SupportsBoiloff => supportsBoiloff;
-        public double sunAndBodyFlux = 0;
-        private double oldTotalVolume;
+        public bool SupportsBoiloff => cryoTanks.Count > 0;
+        private readonly Dictionary<string, double> boiloffProducts = new Dictionary<string, double>();
 
         public int numberOfMLILayers = 0; // base number of layers taken from TANK_DEFINITION configs
 
-        [KSPField(isPersistant = true, guiActive = false, guiActiveEditor = true, guiName = "MLI Layers", guiUnits = "#", guiFormat = "F0"), UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1, scene = UI_Scene.Editor)]
+        [KSPField(isPersistant = true, guiActiveEditor = true, guiName = "MLI Layers", guiUnits = "#", guiFormat = "F0"), UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1, scene = UI_Scene.Editor)]
         public float _numberOfAddedMLILayers = 0; // This is the number of layers added by the player.
         public int numberOfAddedMLILayers
         {
@@ -42,20 +40,19 @@ namespace ModularFuelSystem.Tanks
         [KSPField(guiActiveEditor = true, guiName = "Highly Pressurized?")]
         public bool highlyPressurized = false;
 
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiName = "Wall Temp.", guiUnits = "")]
-        public string debug0Display;
+        [KSPField(guiName = "Wall Temp", groupName = BoiloffGroupName, groupDisplayName = BoiloffGroupDisplayName, groupStartCollapsed = true)]
+        public string sWallTemp;
 
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiName = "Heat Penetration", guiUnits = "")]
-        public string debug1Display;
+        [KSPField(guiName = "Heat Penetration", groupName = BoiloffGroupName)]
+        public string sHeatPenetration;
 
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiName = "Boil-off Loss", guiUnits = "")]
-        public string debug2Display;
+        [KSPField(guiName = "Boil-off Loss", groupName = BoiloffGroupName)]
+        public string sBoiloffLoss;
 
-        [KSPField(isPersistant = false, guiActive = false, guiActiveEditor = false, guiName = "Analytic Cooling", guiUnits = "")]
-        public string debug3Display;
+        [KSPField(guiName = "Analytic Cooling", groupName = BoiloffGroupName)]
+        public string sAnalyticCooling;
 
-        [KSPField(isPersistant = true)]
-        public double partPrevTemperature = -1;
+        private double cooling = 0;
 
         [KSPField]
         public int maxMLILayers = 10;
@@ -69,58 +66,33 @@ namespace ModularFuelSystem.Tanks
         private static double ConductionFactors => RFSettings.Instance.globalConductionCompensation ? Math.Max(1.0d, PhysicsGlobals.ConductionFactor) : 1d;
 
         public double BoiloffMassRate => boiloffMass;
-
+        private double boiloffMass = 0d;
+        private readonly List<FuelTank> cryoTanks = new List<FuelTank>();
+        private readonly List<double> lossInfo = new List<double>();
+        private readonly List<double> fluxInfo = new List<double>();
 
         private FlightIntegrator _flightIntegrator;
 
         double lowestTankTemperature = 300d;
 
-        partial void OnStartRF(StartState state)
+        partial void OnLoadRF(ConfigNode _) {}
+
+        partial void OnStartRF(StartState _)
         {
-            GameEvents.onVesselWasModified.Add(OnVesselWasModified);
-            GameEvents.onEditorShipModified.Add(OnEditorShipModified);
-            GameEvents.onPartDestroyed.Add(OnPartDestroyed);
             if (HighLogic.LoadedSceneIsFlight)
+                _flightIntegrator = vessel.vesselModules.Find(x => x is FlightIntegrator) as FlightIntegrator;
+
+            foreach (var tank in tankList)
             {
-                for (int i = 0; i < vessel.vesselModules.Count; i++)
-                {
-                    if (vessel.vesselModules[i] is FlightIntegrator)
-                    {
-                        _flightIntegrator = vessel.vesselModules[i] as FlightIntegrator;
-                    }
-                }
+                if (tank.maxAmount > 0 && (tank.vsp > 0 || tank.loss_rate > 0))
+                    cryoTanks.Add(tank);
             }
+            CalculateTankArea();
 
-            // Wait to calculate tank area because it depends on drag cubes
-            // MLI depends on tank area so mass will also be recalculated
-            IEnumerator WaitAndRecalculateMass()
+            if (HighLogic.LoadedSceneIsEditor)
             {
-                yield return null;
-                yield return null;
-                yield return null;
-                CalculateTankArea();
-                massDirty = true;
-                CalculateMass();
-            }
-            if (HighLogic.LoadedSceneIsFlight) StartCoroutine(WaitAndRecalculateMass());
-
-            for (int i = tankList.Count - 1; i >= 0; --i)
-            {
-                FuelTank tank = tankList[i];
-                if (tank.maxAmount > 0.0 && (tank.vsp > 0.0 || tank.loss_rate > 0.0))
-                {
-                    supportsBoiloff = true;
-                    break;
-                }
-            }
-
-            if (state == StartState.Editor)
-            {
-                if (maxMLILayers > 0)
-                    ((UI_FloatRange)Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor).maxValue = maxMLILayers;
-                else
-                    Fields[nameof(_numberOfAddedMLILayers)].guiActiveEditor = false;
-
+                Fields[nameof(_numberOfAddedMLILayers)].guiActiveEditor = maxMLILayers > 0;
+                (Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor as UI_FloatRange).maxValue = maxMLILayers;
                 Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor.onFieldChanged = delegate (BaseField field, object value)
                 {
                     massDirty = true;
@@ -128,34 +100,17 @@ namespace ModularFuelSystem.Tanks
                 };
             }
 
-            Fields[nameof(debug0Display)].guiActive = this.supportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
-            Fields[nameof(debug1Display)].guiActive = this.supportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
-            Fields[nameof(debug2Display)].guiActive = this.supportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
+            bool debugBoilActive = SupportsBoiloff && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW);
+            Fields[nameof(sWallTemp)].guiActive = debugBoilActive;
+            Fields[nameof(sHeatPenetration)].guiActive = debugBoilActive;
+            Fields[nameof(sBoiloffLoss)].guiActive = debugBoilActive;
+            Fields[nameof(sAnalyticCooling)].guiActive = debugBoilActive;
 
-            //numberOfAddedMLILayers = Mathf.Round(numberOfAddedMLILayers);
-            //CalculateInsulation();
+            GameEvents.onPartResourceListChange.Add(OnPartResourceListChange);
+            GameEvents.onPartDestroyed.Add(OnPartDestroyed);
         }
 
-        private bool IsProcedural()
-        {
-            try
-            {
-                return this.part.Modules.Contains("SSTUModularPart")
-                    || this.part.Modules.Contains("ProceduralPart")
-                    || this.part.Modules.Contains("WingProcedural")
-                    || this.part.Modules.Contains("ModuleROTank");
-            }
-            catch (Exception e)
-            {
-                log.error(".IsProcedural() exception : {0}", e.Message);
-                return false;
-            }
-        }
-
-        // TODO: Placeholder for moving RF specific nodes out of ModuleFuelTanks.OnLoad()
-        partial void OnLoadRF(ConfigNode node)
-        {
-        }
+        private bool IsProcedural => part.Modules.Contains("SSTUModularPart") || part.Modules.Contains("WingProcedural");
 
         private void CalculateInsulation()
         {
@@ -169,83 +124,47 @@ namespace ModularFuelSystem.Tanks
                 part.heatConductivity = normalizationFactor * 1 / ((1 / insulationFactor) + (1 / part.partInfo.partPrefab.skinInternalConductionMult));
                 CalculateAnalyticInsulationFactor(insulationFactor);
             }
-#if DEBUG
-            DebugSkinInternalConduction();
-#endif
         }
 
         private void CalculateAnalyticInsulationFactor(double insulationFactor)
         {
-            if (this._flightIntegrator != null)
-                part.analyticInternalInsulationFactor = (1 / PhysicsGlobals.AnalyticLerpRateInternal) * (insulationFactor * totalTankArea / part.thermalMass) * RFSettings.Instance.analyticInsulationMultiplier * part.partInfo.partPrefab.analyticInternalInsulationFactor;
-            else
-                part.analyticInternalInsulationFactor = 0;
-        }
-
-        public void DebugSkinInternalConduction()
-        {
-            double num12 = part.ptd.conductionMult * 0.5;
-            double num13 = part.temperature * part.thermalMass;
-            double num14 = part.skinTemperature - part.temperature;
-            if (num14 > 0.001 || num14 < -0.001)
-            {
-                double num15 = part.skinExposedAreaFrac * part.radiativeArea * num12 * PhysicsGlobals.SkinInternalConductionFactor * part.skinInternalConductionMult;
-                double num27 = part.skinThermalMass * part.skinExposedAreaFrac;
-                double num28 = (num13 + part.skinTemperature * num27) / (part.thermalMass + num27);
-                double num23 = -num14 * num15 * part.skinThermalMassRecip * part.skinExposedMassMult;
-                double num24 = num14 * num15 * part.thermalMassReciprocal;
-                double num25 = part.skinTemperature + num23 - num28;
-                double num26 = part.temperature + num24 - num28;
-                double val4;
-                double val3 = val4 = 1.0;
-                if (num14 > 0.0)
-                {
-                    if (num25< 0.0)
-                    {
-                        val3 = (num23 - num25) / num23;
-                    }
-                    if (num26 > 0.0)
-                    {
-                        val4 = (num24 - num26) / num24;
-                    }
-                }
-                else
-                {
-                    if (num25 > 0.0)
-                    {
-                        val3 = (num23 - num25) / num23;
-                    }
-                    if (num26 < 0.0)
-                    {
-                        val4 = (num24 - num26) / num24;
-                    }
-                }
-                double num20 = Math.Max(0.0, Math.Min(val4, val3));
-                log.dbg("part.ptd.skinInteralConductionFlux = {0:0.0000000000000000}", part.ptd.skinInteralConductionFlux);
-                log.dbg("num15                 = {0:0.0000000000000000}", num15);
-                log.dbg("num20 (unknownFactor) = {0:0.0000000000000000}", num20);
-                log.dbg("num14                 = {0:0.0000000000000000}", num14);
-            }
-            log.dbg("part.skinInteralConductionFlux = {0:0.0000000000000000}", part.ptd.skinInteralConductionFlux);
+            part.analyticInternalInsulationFactor = _flightIntegrator is FlightIntegrator
+                ? (1d / PhysicsGlobals.AnalyticLerpRateInternal) * (insulationFactor * totalTankArea / part.thermalMass) * RFSettings.Instance.analyticInsulationMultiplier * part.partInfo.partPrefab.analyticInternalInsulationFactor
+                : 0;
         }
 
         partial void CalculateMassRF(ref double mass)
         {
-            if (totalTankArea <= 0)
-                CalculateTankArea();
-
-            //numberOfAddedMLILayers = Mathf.Round(numberOfAddedMLILayers);
             mass += MLIArealDensity * totalTankArea * totalMLILayers;
         }
 
         partial void GetModuleCostRF(ref double cost)
         {
-            if (totalTankArea <= 0)
-                CalculateTankArea();
-
             // Estimate material cost at 0.10764/m2 treating as Fund = $1000 (for RO purposes)
             // Plus another 0.1 for installation
-            cost += (float)(MLIArealCost * totalTankArea * totalMLILayers);
+            cost += MLIArealCost * totalTankArea * totalMLILayers;
+        }
+
+        partial void UpdateRF()
+        {
+            if (HighLogic.LoadedSceneIsFlight && (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW) && SupportsBoiloff)
+            {
+                string MLIText = totalMLILayers > 0 ? $"{GetMLITransferRate(part.skinTemperature, part.temperature):F4}" : "No MLI";
+                sWallTemp = $"{part.temperature:F4} ({MLIText} * {part.radiativeArea:F2} m2)";
+                sAnalyticCooling = Utilities.FormatFlux(cooling);
+
+                sHeatPenetration = "";
+                sBoiloffLoss = "";
+                foreach (var m in lossInfo)
+                    sBoiloffLoss += $"{m:F4} kg/hr | ";
+                foreach (var Q in fluxInfo)
+                    sHeatPenetration += Utilities.FormatFlux(Q) + " | ";
+
+                if (!string.IsNullOrEmpty(sBoiloffLoss))
+                    sBoiloffLoss = sBoiloffLoss.Remove(sBoiloffLoss.Length - 3);
+                if (!string.IsNullOrEmpty(sHeatPenetration))
+                    sHeatPenetration = sHeatPenetration.Remove(sHeatPenetration.Length - 3);
+            }
         }
 
         public void FixedUpdate()
@@ -253,233 +172,167 @@ namespace ModularFuelSystem.Tanks
             //print ("[Real Fuels]" + Time.time.ToString ());
             if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready)
             {
-                if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
-                {
-                    debug1Display = "";
-                    debug2Display = "";
-                    debug0Display = "";
-                    debug3Display = "";
-                    Fields[nameof(debug3Display)].guiActive = (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW) && this.supportsBoiloff && TimeWarp.CurrentRate > PhysicsGlobals.ThermalMaxIntegrationWarp;
-                }
-
                 // MLI performance varies by temperature delta
                 CalculateInsulation();
 
-                if(!_flightIntegrator.isAnalytical && supportsBoiloff)
-                    StartCoroutine(CalculateTankBoiloff(_flightIntegrator.timeSinceLastUpdate));
+                if(!_flightIntegrator.isAnalytical && SupportsBoiloff)
+                    CalculateTankBoiloff(_flightIntegrator.timeSinceLastUpdate, _flightIntegrator.isAnalytical);
             }
         }
 
-        private IEnumerator CalculateTankBoiloff(double deltaTime, bool analyticalMode = false)
+        private void HandleCooling(ref double cooling, double deltaTime, bool analyticalMode)
         {
-            // Need to ensure that all heat compensation (radiators, heat pumps, etc) run first.
+            cooling = 0;
+            if (analyticalMode)
+            {
+                if (part.thermalInternalFlux < 0)
+                    cooling = part.thermalInternalFlux;
+                else if (part.thermalInternalFluxPrevious < 0)
+                    cooling = part.thermalInternalFluxPrevious;
+
+                if (cooling < 0)
+                {
+                    // in analytic mode, MFTRF interprets this as an attempt to cool the tanks
+                    // Questionable since the thermalInternalFlux is already tracking it??
+                    analyticInternalTemp += cooling * part.thermalMassReciprocal * deltaTime;
+                }
+            }
+        }
+
+        private double GetBoiloffTransferRate(double deltaTemp, double wettedArea, in FuelTank tank)
+        {
+            double wallFactor = tank.wallConduction > 0 ? tank.wallThickness / tank.wallConduction : 0;
+            double insulationFactor = tank.insulationConduction > 0 ? tank.insulationThickness / tank.insulationConduction : 0;
+            double resourceFactor = tank.resourceConductivity > 0 ? 0.01 / tank.resourceConductivity : 0;
+            double divisor = Math.Max(double.Epsilon, wallFactor + insulationFactor + resourceFactor);
+
+            return deltaTemp * wettedArea / divisor;
+        }
+
+
+        private void CalculateTankBoiloff(double deltaTime, bool analyticalMode = false, double unclampedIntScalar = 0, double unclampedSkinScalar = 0)
+        {
             if (totalTankArea <= 0)
+            {
+                Debug.LogError("RF: CalculateTankBoiloff ran without calculating tank data!");
                 CalculateTankArea();
+            }
+            if (double.IsNaN(part.temperature))
+            {
+                Debug.LogError($"RF: CalculateTankBoiloff found NaN part.temperature on {part}");
+                return;
+            }
 
-            if (!analyticalMode)
-                yield return new WaitForFixedUpdate();
-            
             boiloffMass = 0d;
-
-            previewInternalFluxAdjust = 0;
+            lossInfo.Clear();
+            fluxInfo.Clear();
 
             bool hasCryoFuels = CalculateLowestTankTemperature();
-
-            if (tankList.Count > 0 && lowestTankTemperature < 300d && MFSSettings.radiatorMinTempMult >= 0d)
-                part.radiatorMax = (lowestTankTemperature * MFSSettings.radiatorMinTempMult) / part.maxTemp;
+            if (hasCryoFuels && MFSSettings.radiatorMinTempMult >= 0d)
+                part.radiatorMax = lowestTankTemperature * MFSSettings.radiatorMinTempMult / part.maxTemp;
 
             if (fueledByLaunchClamp)
             {
                 if (hasCryoFuels)
                 {
-                    part.temperature = lowestTankTemperature;
-                    part.skinTemperature = lowestTankTemperature;
+                    if (analyticalMode)
+                        analyticInternalTemp = lowestTankTemperature;
+                    else
+                        part.temperature = lowestTankTemperature;
+                    // part.skinTemperature or analyticSkinTemp ? Nah.
                 }
                 fueledByLaunchClamp = false;
-                yield break;
+                return;
             }
 
-            if (!double.IsNaN(part.temperature))
-                partPrevTemperature = part.temperature;
-            else
-                part.temperature = partPrevTemperature;
-
-            if (deltaTime > 0)
+            if (deltaTime > 0 && !CheatOptions.InfinitePropellant)
             {
-                double deltaTimeRecip = 1d / deltaTime;
-                log.detail("internalFlux = {0}, thermalInternalFluxPrevious = {1}, analytic internal flux = {2}", part.thermalInternalFlux, part.thermalInternalFluxPrevious, previewInternalFluxAdjust);
+                //Debug.Log($"internalFlux = {part.thermalInternalFlux}, thermalInternalFluxPrevious = {part.thermalInternalFluxPrevious}, analytic internal flux = {previewInternalFluxAdjust}");
+                HandleCooling(ref cooling, deltaTime, analyticalMode);
 
-                if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
+                foreach (var tank in cryoTanks)
                 {
-                    string MLIText = totalMLILayers > 0 ? GetMLITransferRate(part.skinTemperature, part.temperature).ToString("F4") : "No MLI";
-                    debug0Display = part.temperature.ToString("F4") + "(" + MLIText + " * " + (part.radiativeArea * part.skinExposedAreaFrac).ToString("F2") + "m2)";
-                }
-
-
-                double cooling = 0;
-
-                if (analyticalMode)
-                {
-                    if (part.thermalInternalFlux < 0)
-                        cooling = part.thermalInternalFlux;
-                    else if (part.thermalInternalFluxPrevious < 0)
-                        cooling = part.thermalInternalFluxPrevious;
-
-                    if (cooling < 0)
+                    if (tank.amount > 0 && tank.vsp > 0)
                     {
-                        // in analytic mode, MFTRF interprets this as an attempt to cool the tanks
-                        analyticInternalTemp += cooling * part.thermalMassReciprocal * deltaTime;
-                        // because of what we're doing in CalculateAnalyticInsulationFactor(), it will take too much time to reach that temperature so
-                        part.temperature += cooling* part.thermalMassReciprocal * deltaTime;
-                    }
-                }
-
-                debug3Display = Utilities.FormatFlux(cooling);
-
-                for (int i = tankList.Count - 1; i >= 0; --i)
-                {
-                    FuelTank tank = tankList[i];
-                    if (tank.amount <= 0) continue;
-
-                    if (tank.vsp > 0.0 && tank.totalArea > 0)
-                    {
-                        // Opposite of original boil off code. Finds massLost first.
-                        double massLost = 0.0;
-                        double deltaTemp;
+                        double massLost = 0;
                         double hotTemp = part.temperature;
-                        double tankRatio = tank.maxAmount / volume;
 
                         if (RFSettings.Instance.ferociousBoilOff)
                             hotTemp = Math.Max(((hotTemp * part.thermalMass) - (tank.temperature * part.resourceThermalMass)) / (part.thermalMass - part.resourceThermalMass), part.temperature);
 
-                        deltaTemp = hotTemp - tank.temperature;
-
-                        if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
+                        // We might be in analytic mode, and have a target temperature = analyticInternalTemp/analyticSkinTemp, and "progress" towards it reprsented by the scalar params
+                        if (analyticalMode)
                         {
-                            if (debug2Display != "")
-                                debug2Display += " / ";
-
-                            if (debug1Display != "")
-                                debug1Display += " / ";
+                            hotTemp = UtilMath.Lerp(part.temperature, analyticInternalTemp, Math.Min(1, unclampedIntScalar / 2));
+                            DebugLog($"[MFTRF] CalculateBoiloff.Analytic using adjusted temp {hotTemp:F1} from {part.temperature:F1} towards {analyticInternalTemp:F1} based on scalar {unclampedIntScalar:F2}");
                         }
 
+                        double deltaTemp = hotTemp - tank.temperature;
                         double Q = 0;
                         if (deltaTemp > 0)
                         {
-#if DEBUG
-	                        if (analyticalMode) log.dbg("Tank {0} surface area = {1}", tank.name, tank.totalArea);
-#endif
-
                             double wettedArea = tank.totalArea; // disabled until proper wetted vs ullage conduction can be done (tank.amount / tank.maxAmount);
-
-                            if (tank.isDewar)
-                                Q = GetDewarTransferRate(hotTemp, tank.temperature, tank.totalArea);
-                            else
-                                Q = deltaTemp /
-                                    ((tank.wallThickness / (tank.wallConduction * wettedArea))
-                                     + (tank.insulationThickness / (tank.insulationConduction * wettedArea))
-                                     + (tank.resourceConductivity > 0 ? (0.01 / (tank.resourceConductivity * wettedArea)) : 0));
+                            Q = tank.isDewar ? GetDewarTransferRate(hotTemp, tank.temperature, tank.totalArea)
+                                             : GetBoiloffTransferRate(deltaTemp, wettedArea, tank);
 
                             Q *= 0.001d; // convert to kilowatts
+                            massLost = Q / tank.vsp;
 
-                            if (!double.IsNaN(Q))
-                                massLost = Q / tank.vsp;
-                            else
-                                log.dbg("Q = NaN! W - T - F!!!");
-
-                            if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
-                            {
-                                // Only do debugging displays if debugging enabled in RFSettings
-
-                                debug1Display += Utilities.FormatFlux(Q);
-                                debug2Display += (massLost * 1000 * 3600).ToString("F4") + "kg/hr";
-                            }
+                            lossInfo.Add(massLost * 1000 * 3600);
+                            fluxInfo.Add(Q);
                             massLost *= deltaTime; // Frame scaling
                         }
 
-                        double lossAmount = massLost / tank.density;
+                        double d = tank.density > 0 ? tank.density : 1;
+                        double lossAmount = massLost / d;
+                        lossAmount = Math.Min(lossAmount, tank.amount);
 
-                        if (double.IsNaN(lossAmount))
-                            log.dbg("{0} lossAmount is NaN!", tank.name);
-                        else
+                        if (lossAmount > 0)
                         {
-                            if (lossAmount > tank.amount)
+                            tank.amount -= lossAmount;
+
+                            // See if there is boiloff byproduct and see if any other parts want to accept it.
+                            if (tank.boiloffProductResource != null)
                             {
-                                if (!CheatOptions.InfinitePropellant)
-                                    tank.amount = 0d;
+                                double boiloffProductAmount = -(massLost / tank.boiloffProductResource.density);
+                                double retainedAmount = part.RequestResource(tank.boiloffProductResource.id, boiloffProductAmount, ResourceFlowMode.STAGE_PRIORITY_FLOW, Utilities.KerbalismFound);
+                                massLost -= retainedAmount * tank.boiloffProductResource.density;
+
+                                if (Utilities.KerbalismFound)
+                                {
+                                    string rName = tank.boiloffProductResource.name;
+                                    retainedAmount /= deltaTime;
+                                    boiloffProducts[rName] = boiloffProducts.TryGetValue(rName, out double v) ? v + retainedAmount : retainedAmount;
+                                }
                             }
+                        }
+
+                        boiloffMass += massLost;
+
+                        // subtract heat from boiloff
+                        // subtracting heat in analytic mode is tricky: Analytic flux handling is 'cheaty' and tricky to predict.
+
+                        if (Q > 0)
+                        {
+                            double heatLost = -Q;
+                            if (!analyticalMode)
+                                part.AddThermalFlux(heatLost);
                             else
                             {
-                                if (!CheatOptions.InfinitePropellant)
-                                    tank.amount -= lossAmount;
-
-                                // See if there is boiloff byproduct and see if any other parts want to accept it.
-                                if (tank.boiloffProductResource != null)
-                                {
-                                    double boiloffProductAmount = -(massLost / tank.boiloffProductResource.density);
-                                    double retainedAmount = part.RequestResource(tank.boiloffProductResource.id, boiloffProductAmount, ResourceFlowMode.STAGE_PRIORITY_FLOW);
-                                    massLost -= retainedAmount * tank.boiloffProductResource.density;
-                                }
-
-                                boiloffMass += massLost;
-
-                            }
-                            // subtract heat from boiloff
-                            // subtracting heat in analytic mode is tricky: Analytic flux handling is 'cheaty' and tricky to predict. 
-                            // scratch sheet: example
-                            // [ModularFuelSystem.ModuleFuelTankRF] proceduralTankRealFuels Analytic Temp = 256.679360297684, Analytic Internal = 256.679360297684, Analytic Skin = 256.679360297684
-                            // [ModularFuelSystem.ModuleFuelTankRF] proceduralTankRealFuels deltaTime = 17306955.5092776, heat lost = 6638604.21227684, thermalMassReciprocal = 0.00444787360733243
-
-                            if (!double.IsNaN(Q))
-                            {
-                                double heatLost = -Q;
-                                if (!analyticalMode)
-                                {
-                                    part.AddThermalFlux(heatLost);
-                                }
-                                else
-                                {
-                                    analyticInternalTemp = analyticInternalTemp + (heatLost * part.thermalMassReciprocal * deltaTime);
-                                    // Don't try to adjust flux if significant time has passed; it never works out.
-                                    // Analytic mode flux only gets applied if timewarping AND analytic mode was set.
-                                    if (TimeWarp.CurrentRate > 1)
-                                        previewInternalFluxAdjust += heatLost;
-                                    else
-                                        log.dbg("boiloff function running with delta time of {0} (vessel.lastUT = {1} seconds ago)", deltaTime, (Planetarium.GetUniversalTime() - vessel.lastUT).ToString("F4"));
-#if DEBUG
-                                    if (deltaTime > 0) log.dbg("{0} deltaTime = {1}, heat lost = {2}, thermalMassReciprocal = {3}", part.name, deltaTime, heatLost, part.thermalMassReciprocal);
-#endif
-                                }
-                            }
-                            else
-                            {
-                                log.dbg("WHO WOULD WIN? Some Well Written Code or One Misplaced NaN?");
-                                log.dbg("heatLost = {0}", Q);
-                                log.dbg("deltaTime = {0}", deltaTime);
-                                log.dbg("deltaTimeRecip = {0}", deltaTimeRecip);
-                                log.dbg("massLost = {0}" + massLost);
-                                log.dbg("tank.vsp = {0}" + tank.vsp);
+                                analyticInternalTemp += heatLost * part.thermalMassReciprocal * deltaTime;
+                                DebugLog($"{part.name} deltaTime = {deltaTime:F2}s, heat lost = {heatLost:F4}, thermalMassReciprocal = {part.thermalMassReciprocal:F6}");
                             }
                         }
                     }
-                    else if (tank.loss_rate > 0 && tank.amount > 0)
+                    else if (tank.amount > 0 && tank.loss_rate > 0)
                     {
                         double deltaTemp = part.temperature - tank.temperature;
                         if (deltaTemp > 0)
                         {
                             double lossAmount = tank.maxAmount * tank.loss_rate * deltaTemp * deltaTime;
-                            if (lossAmount > tank.amount)
-                            {
-                                lossAmount = -tank.amount;
-                                tank.amount = 0d;
-                            }
-                            else
-                            {
-                                lossAmount = -lossAmount;
-                                tank.amount += lossAmount;
-                            }
-                            double massLost = tank.density * lossAmount;
-                            boiloffMass += massLost;
+                            lossAmount = Math.Min(lossAmount, tank.amount);
+                            tank.amount -= lossAmount;
+                            boiloffMass += lossAmount * tank.density;
                         }
                     }
                 }
@@ -492,46 +345,15 @@ namespace ModularFuelSystem.Tanks
             highlyPressurized = def.highlyPressurized;
             numberOfMLILayers = def.numberOfMLILayers;
 
-            if (def.maxMLILayers >= 0f)
-            {
-                maxMLILayers = def.maxMLILayers;
-            }
-            else
-            {
-                maxMLILayers = (int)Fields[nameof(maxMLILayers)].originalValue;
-            }
+            maxMLILayers = def.maxMLILayers >= 0 ? def.maxMLILayers : (int)Fields[nameof(maxMLILayers)].originalValue;
+            minUtilization = def.minUtilization > 0 ? def.minUtilization : (float)Fields[nameof(minUtilization)].originalValue;
+            maxUtilization = def.maxUtilization > 0 ? def.maxUtilization : (float)Fields[nameof(maxUtilization)].originalValue;
 
             if (HighLogic.LoadedSceneIsEditor)
             {
-                if (maxMLILayers > 0)
-                {
-                    Fields[nameof(_numberOfAddedMLILayers)].guiActiveEditor = true;
-                    ((UI_FloatRange)Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor).maxValue = maxMLILayers;
-                    _numberOfAddedMLILayers = Math.Min(_numberOfAddedMLILayers, maxMLILayers);
-                }
-                else
-                {
-                    Fields[nameof(_numberOfAddedMLILayers)].guiActiveEditor = false;
-                    _numberOfAddedMLILayers = 0;
-                }
-            }
-
-            if (def.minUtilization > 0f)
-            {
-                minUtilization = def.minUtilization;
-            }
-            else
-            {
-                minUtilization = (float)Fields[nameof(minUtilization)].originalValue;
-            }
-
-            if (def.maxUtilization > 0f)
-            {
-                maxUtilization = def.maxUtilization;
-            }
-            else
-            {
-                maxUtilization = (float)Fields[nameof(maxUtilization)].originalValue;
+                Fields[nameof(_numberOfAddedMLILayers)].guiActiveEditor = maxMLILayers > 0;
+                _numberOfAddedMLILayers = Mathf.Clamp(_numberOfAddedMLILayers, 0, maxMLILayers);
+                ((UI_FloatRange)Fields[nameof(_numberOfAddedMLILayers)].uiControlEditor).maxValue = maxMLILayers;
             }
 
             InitUtilization();
@@ -557,8 +379,29 @@ namespace ModularFuelSystem.Tanks
 
         partial void ParseInsulationFactor(ConfigNode node)
         {
-            if (node.HasValue("numberOfMLILayers"))
-                int.TryParse(node.GetValue("numberOfMLILayers"), out numberOfMLILayers);
+            node.TryGetValue("numberOfMLILayers", ref numberOfMLILayers);
+        }
+
+        // Fired from ProcParts when updating the collider and drag cubes, after OnPartVolumeChanged
+        [KSPEvent(guiActive = false, active = true)]
+        public void OnPartColliderChanged() => CalculateTankArea();
+
+        [KSPEvent]
+        public void OnResourceMaxChanged(BaseEventDetails _) => CalculateTankArea();
+        private void OnPartResourceListChange(Part p)
+        {
+            if (p == part)
+                CalculateTankArea();
+        }
+
+        // This is how you update drag cubes, we shouldn't be the service for this, but left-over code.
+        private void UpdateDragCubes()
+        {
+            DragCube dragCube = DragCubeSystem.Instance.RenderProceduralDragCube(part);
+            part.DragCubes.ClearCubes();
+            part.DragCubes.Cubes.Add(dragCube);
+            part.DragCubes.ResetCubeWeights();
+            part.DragCubes.ForceUpdate(true, true, false);
         }
 
         public void CalculateTankArea()
@@ -566,141 +409,63 @@ namespace ModularFuelSystem.Tanks
             // TODO: Codify a more accurate tank area calculator.
             // Thought: cube YN/YP can be used to find the part diameter / circumference... X or Z finds the length
             // Also should try to determine if tank has a common bulkhead - and adjust heat flux into individual tanks accordingly
-#if DEBUG
-            log.dbg("CalculateTankArea() running");
-#endif
+            SetTankAreaInfo(volume);
 
-            if (HighLogic.LoadedSceneIsEditor)
-            {
-                if (!this.part.DragCubes.None && this.oldTotalVolume != this.totalVolume)
-                {
+            double areaCubes = CalculateTankAreaCubes();
 
-                    if (this.IsProcedural())
-                    {
-                        bool origProceduralValue = this.part.DragCubes.Procedural;
-                        this.part.DragCubes.Procedural = true;
-                        this.part.DragCubes.ForceUpdate(true, true, true);
-                        this.part.DragCubes.SetDragWeights();
-                        this.part.DragCubes.RequestOcclusionUpdate();
-                        this.part.DragCubes.SetPartOcclusion();
-                        this.part.DragCubes.Procedural = origProceduralValue;
-                        this.oldTotalVolume = this.totalVolume;
-                    }
-                }
-            }
-
-            totalTankArea = 0f;
-
-            for (int i = 0; i< 6; ++i)
-            {
-                totalTankArea += part.DragCubes.WeightedArea[i];
-            }
-#if DEBUG
-            log.info("Part WeightedArea: {0} = {1:0.00}", part.name, totalTankArea);
-            log.info("Part Area: {0} = {1:0.00}", part.name, part.DragCubes.Area);
-#endif
             // This allows a rough guess as to individual tank surface area based on ratio of tank volume to total volume but it breaks down at very small fractions
             // So use greater of spherical calculation and tank ratio of total area.
             // if for any reason our totalTankArea is still 0 (no drag cubes available yet or analytic temp routines executed first)
             // then we're going to be defaulting to spherical calculation
-            double tankMaxAmount;
-            double tempTotal = 0;
+            double areaSpherical = SphericalAreaFromVolume(totalVolume);
+            double areaPartsSpherical = CalculateTankAreaFromSphericalSubTanks();
 
-            if (RFSettings.Instance.debugBoilOff)
-                log.info("Initializing {0}.totalTankArea as {1}", part.name, totalTankArea);
-
-            for (int i = tankList.Count - 1; i >= 0; --i)
+            totalTankArea = Math.Max(areaSpherical, areaPartsSpherical);
+            totalTankArea = Math.Max(totalTankArea, 0.1);
+            if (RFSettings.Instance.debugBoilOff || RFSettings.Instance.debugBoilOffPAW)
             {
-                FuelTank tank = tankList[i];
-                if (tank.maxAmount > 0.0)
-                {
-                    tankMaxAmount = tank.maxAmount;
-
-                    if (tank.utilization > 1.0)
-                        tankMaxAmount /= tank.utilization;
-
-                    tank.tankRatio = tankMaxAmount / volume;
-
-                    tank.totalArea = Math.Max(Math.Pow(Math.PI, 1.0 / 3.0) * Math.Pow((tankMaxAmount / 1000.0) * 6, 2.0 / 3.0), totalTankArea * tank.tankRatio);
-                    tempTotal += tank.totalArea;
-
-                    if (RFSettings.Instance.debugBoilOff)
-                    {
-                        log.detail("{0}.tankRatio = {1}", tank.name, tank.tankRatio);
-                        log.detail("{0}.maxAmount = {1}", tank.name, tankMaxAmount);
-                        log.detail("{0}.totalTankArea = {1}", part.name, totalTankArea);
-                        log.detail("Tank surface area = {0}", tank.totalArea);
-                        log.dbg("tank Dewar status = {0}", tank.isDewar);
-                    }
-                }
+                Debug.Log($"[RealFuels.ModuleFuelTankRF] {part.name} Area Calcs: DragCube: {areaCubes:F2} | TotalSpherical: {areaSpherical:F2} | SubTankSpherical: {areaPartsSpherical:F2}");
+                Debug.Log($"[RealFuels.ModuleFuelTankRF] {part.name}.totalTankArea = {totalTankArea:F2}");
             }
-            if (!(totalTankArea > 0) || tempTotal > totalTankArea)
-                totalTankArea = tempTotal;
-            if (RFSettings.Instance.debugBoilOff)
-            {
-                log.info("{0}.totalTankArea = {1}", part.name, totalTankArea);
-                log.info("{0}.GetModuleSize() = {1:0.00}" + part.name, part.GetModuleSize(Vector3.zero));
-            }
-        }
-
-        // todo Evaluate if we really still need this. Not sure it's being fired in the editor at all anymore; even when mods known to fire this event are doing so.
-        public void OnVesselWasModified(Vessel v)
-        {
-            log.detail("ModuleFuelTanksRF.OnVesselWasModified()");
-            if (v != null && v == this.vessel)
-                CalculateTankArea();
-        }
-
-        public void OnEditorShipModified(ShipConstruct ship)
-        {
-            log.dbg("ModuleFuelTanksRF.OnEditorShipModified()");
-            CalculateTankArea();
         }
 
         private void OnPartDestroyed(Part p)
         {
             if (p == this.part)
             {
-                GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
                 GameEvents.onPartDestroyed.Remove(OnPartDestroyed);
-                GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
+                GameEvents.onPartResourceListChange.Remove(OnPartResourceListChange);
             }
         }
 
         private bool CalculateLowestTankTemperature()
         {
-            bool result = false;
             lowestTankTemperature = 300;
-            for (int i = tankList.Count - 1; i >= 0; --i)
-            {
-                FuelTank tank = tankList[i];
-                if (tank.maxAmount > 0d && (tank.vsp > 0.0 || tank.loss_rate > 0d))
-                {
-                    lowestTankTemperature = Math.Min(lowestTankTemperature, tank.temperature);
-                    result = true;
-                }
-            }
-            return result;
+            foreach (var tank in cryoTanks)
+                lowestTankTemperature = Math.Min(lowestTankTemperature, tank.temperature);
+            return cryoTanks.Count > 0;
         }
 
         #region IAnalyticTemperatureModifier
         // Analytic Interface
         public void SetAnalyticTemperature(FlightIntegrator fi, double analyticTemp, double predictedInternalTemp, double predictedSkinTemp)
         {
-            //if (analyticInternalTemp > lowestTankTemperature)
-#if DEBUG
-            if(this.supportsBoiloff) log.dbg("{0} Analytic Temp = {1}, Analytic Internal = {2}, Analytic Skin = {3}", part.name, analyticTemp, predictedInternalTemp, predictedSkinTemp);
-#endif
-            
             analyticSkinTemp = predictedSkinTemp;
             analyticInternalTemp = predictedInternalTemp;
 
-            if (this.supportsBoiloff)
+            if (SupportsBoiloff)
             {
+                DebugLog($"{part.name} Analytic Temp = {analyticTemp:F2}, Analytic Internal = {predictedInternalTemp:F2}, Analytic Skin = {predictedSkinTemp:F2}");
+                double lerpScalarInt = PhysicsGlobals.AnalyticLerpRateInternal * fi.timeSinceLastUpdate;
+                double lerpScalarSkin = PhysicsGlobals.AnalyticLerpRateSkin * fi.timeSinceLastUpdate;
+                double skinScalar = lerpScalarSkin * part.analyticSkinInsulationFactor;
+                double intScalar = lerpScalarInt * part.analyticInternalInsulationFactor;
+                // A value of 1.0 (unclamped) indicates the time that has passed == the expected time to equalize temperatures
+                // For values <= 1-ish, we may consider trying to scale the temp progress down by accounting for boiloff.
+                // Alternatively, just adjust the analytic output using the boiloff calculation anyway.
+
                 if (fi.timeSinceLastUpdate < double.MaxValue)
-                {
-                    StartCoroutine(CalculateTankBoiloff(fi.timeSinceLastUpdate, true));
-                }
+                    CalculateTankBoiloff(fi.timeSinceLastUpdate, fi.isAnalytical, intScalar, skinScalar);
                 else if (CalculateLowestTankTemperature())
                 {
                     // Vessel is freshly spawned and has cryogenic tanks, set temperatures appropriately
@@ -713,44 +478,58 @@ namespace ModularFuelSystem.Tanks
         public double GetSkinTemperature(out bool lerp)
         {
             lerp = false;
-            return analyticSkinTemp;
+            return Math.Max(analyticSkinTemp, PhysicsGlobals.SpaceTemperature);
         }
 
         public double GetInternalTemperature(out bool lerp)
         {
-            // During analytic, pin our internal temperature. We'll figure out the difference and apply as much boiloff flux as needed for this to be valid.
             lerp = false;
-            return analyticInternalTemp;
+            return Math.Max(analyticInternalTemp, PhysicsGlobals.SpaceTemperature);
         }
         #endregion
 
         #region Analytic Preview Interface
+
+        // We don't really implement this interface anymore.
+        // Boiloff should not be a significant portion of the flux generation that it will actively keep
+        // the vessel cool and will change the steady-state temperature that is being calculated/previewed here.
+        // Diff-Eq problem: this calculates the steady-state temp, of which boiloff result is an input.
+        // However, boiloff as a resource can be consumed, so the amount of time to target this steady state changes.
+        //
+        // Normally called every FixedUpdate by FlightIntegrator in Analytic Mode
+        // May be called outside of Analytic Mode if part.temp/part.skinTemp were out of bounds
         public void AnalyticInfo(FlightIntegrator fi, double sunAndBodyIn, double backgroundRadiation, double radArea, double absEmissRatio, double internalFlux, double convCoeff, double ambientTemp, double maxPartTemp)
         {
-            if (_flightIntegrator != fi)
-                fi = _flightIntegrator;
-
-            previewInternalFluxAdjust = 0;
-            sunAndBodyFlux = sunAndBodyIn;
+            if (!fi.isAnalytical)
+                Debug.Log($"[MFTRF] AnalyticInfo called in non-analytic mode for {vessel}.  dT: {fi.timeSinceLastUpdate:F2}s");
+            /*
             if (TimeWarp.CurrentRate == 1)
-                log.dbg("AnalyticInfo being called with: sunAndBodyIn = {0}, backgroundRadiation = {1}, radArea = {2}, absEmissRatio = {3}, internalFlux = {4}, convCoeff = {5}, ambientTemp = {6}, maxPartTemp = {7}"
-                        , sunAndBodyIn, backgroundRadiation, radArea, absEmissRatio, internalFlux, convCoeff, ambientTemp, maxPartTemp
-				);
-            //previewInternalFluxAdjust = internalFlux;
+                DebugLog("AnalyticInfo being called with: sunAndBodyIn = " + sunAndBodyIn.ToString()
+                         + ", backgroundRadiation = " + backgroundRadiation.ToString()
+                         + ", radArea = "+ radArea.ToString()
+                         + ", absEmissRatio = " + absEmissRatio.ToString()
+                         + ", internalFlux = " + internalFlux.ToString()
+                         + ", convCoeff = " + convCoeff.ToString()
+                         + ", ambientTemp = " + ambientTemp.ToString()
+                         + ", maxPartTemp = " + maxPartTemp.ToString()
+                        );
             //float deltaTime = (float)(Planetarium.GetUniversalTime() - vessel.lastUT);
             //if (this.supportsBoiloff)
-            //{
-            //    StartCoroutine(CalculateTankBoiloff(TimeWarp.fixedDeltaTime, true));
-            //}
+            //    CalculateTankBoiloff(TimeWarp.fixedDeltaTime, true);
+            */
         }
 
-        public double InternalFluxAdjust()
-        {
-            return previewInternalFluxAdjust;
-        }
+        public double InternalFluxAdjust() => 0;
         #endregion
 
-        #region Cryogenics
+        void DebugLog(string msg)
+        {
+#if DEBUG
+            Debug.Log("[RealFuels.ModuleFuelTankRF] " + msg);
+#endif
+        }
+
+#region Cryogenics
         // TODO MLI convective coefficient needs some research. I chose a value that would allow MLI in-atmo to provide better insulation than a naked tank.
         //      But it should probably be based on the gas composition of the planet involved?
 
@@ -785,5 +564,75 @@ namespace ModularFuelSystem.Tanks
         }
 
         #endregion
+
+        #region Kerbalism
+        /// <summary>
+        /// Called by Kerbalism every frame. Uses their resource system when Kerbalism is installed.
+        /// </summary>
+        public virtual string ResourceUpdate(Dictionary<string, double> availableResources, List<KeyValuePair<string, double>> resourceChangeRequest)
+        {
+            //resourceChangeRequest.Clear();
+
+            foreach (var resourceRequest in boiloffProducts)
+            {
+                var definition = PartResourceLibrary.Instance.GetDefinition(resourceRequest.Key);
+                if (definition is null)
+                    continue;
+
+                resourceChangeRequest.Add(new KeyValuePair<string, double>(resourceRequest.Key, -resourceRequest.Value));
+            }
+            boiloffProducts.Clear();
+
+            return "boiloff product";
+        }
+        #endregion
+
+        #region Tank Dimensions
+
+        private void SetTankAreaInfo(double volume)
+        {
+            foreach (var tank in tankList)
+            {
+                double amt = tank.maxAmount;
+                if (amt > 0 && tank.utilization > 0)
+                    amt /= tank.utilization;
+                tank.totalArea = SphericalAreaFromVolume(amt);
+                tank.tankRatio = amt / volume;
+            }
+        }
+
+        private double CalculateTankAreaCubes()
+        {
+            double area = 0;
+            if (IsProcedural && !part.DragCubes.None)
+                UpdateDragCubes();
+            // part.DragCubes.WeightedArea hasn't been computed in Editor
+            // Recompute from the base cubes.
+            foreach (var cube in part.DragCubes?.Cubes)
+                for (int i = 0; i < 6; i++)
+                    area += cube.Weight * cube.Area[i];
+            return area;
+        }
+
+        private double SphericalAreaFromVolume(double volume)
+        {
+            double radius = Math.Pow(volume * 0.001 * 0.75f / Math.PI, 1f / 3);
+            double area = 4 * Math.PI * radius * radius;
+            return area;
+        }
+
+        private double CalculateTankAreaFromSphericalSubTanks()
+        {
+            double area = 0;
+            foreach (var tank in tankList)
+                area += tank.totalArea;
+            /*
+            if (RFSettings.Instance.debugBoilOff)
+                Debug.Log($"[RealFuels.ModuleFuelTankRF] {tank.name} (isDewar: {tank.isDewar}): tankRatio = {tank.tankRatio:F2} | maxAmount = {tank.maxAmount:F2} | surface area = {tank.totalArea}");
+            */
+            return area;
+        }
+
+#endregion
     }
 }

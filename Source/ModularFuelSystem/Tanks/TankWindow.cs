@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
+using System.Text;
 using UnityEngine;
+using System.Collections.ObjectModel;
 
 using KSP.UI.Screens;
 
@@ -50,7 +52,16 @@ namespace ModularFuelSystem.Tanks
             EditorLogic editor = EditorLogic.fetch;
             if(editor != null)
                 editor.Unlock("MFTGUILock");
-		}
+            //Debug.Log(StackTraceUtility.ExtractStackTrace());
+        }
+
+        public static void HideGUIForModule(ModuleFuelTanks tank_module)
+        {
+            if (instance != null && instance.tank_module == tank_module)
+            {
+                HideGUI();
+            }
+        }
 
 		public static void ShowGUI (ModuleFuelTanks tank_module)
 		{
@@ -105,16 +116,19 @@ namespace ModularFuelSystem.Tanks
 			while (EditorLogic.fetch != null) {
 				if (editor.editorScreen == EditorScreen.Actions) {
 					if (!ActionGroupMode) {
+						Debug.Log("TankWindow.CheckActionGroupEditor() hiding tank window (!AGM)");
 						HideGUI ();
 						OnActionGroupEditorOpened.Fire ();
 					}
 					EditorActionGroups age = EditorActionGroups.Instance;
 					if (tank_module && !age.GetSelectedParts ().Contains (tank_module.part)) {
+						Debug.Log("TankWindow.CheckActionGroupEditor() hiding tank window (selected part does not contain this module)");
 						HideGUI ();
 					}
 					ActionGroupMode = true;
 				} else {
 					if (ActionGroupMode) {
+						Debug.Log("TankWindow.CheckActionGroupEditor() hiding tank window (editorScreen == Actions && AGM)");
 						HideGUI ();
 						OnActionGroupEditorClosed.Fire ();
 					}
@@ -166,12 +180,12 @@ namespace ModularFuelSystem.Tanks
 			}
             if (ActionGroupMode) {
                 if (guiWindowRect.width == 0) {
-                    guiWindowRect = new Rect (430 * posMult, 365, 438, (Screen.height - 365));
+                    guiWindowRect = new Rect (430 * posMult, 365, 460, (Screen.height - 365));
                 }
                 tooltipRect = new Rect (guiWindowRect.xMin + 440, mousePos.y-5, 300, 20);
             } else {
                 if (guiWindowRect.width == 0) {
-                    guiWindowRect = new Rect (Screen.width - 8 - 430 * (posMult+1), 365, 438, (Screen.height - 365));
+                    guiWindowRect = new Rect (Screen.width - 8 - 430 * (posMult+1), 365, 460, (Screen.height - 365));
 				}
                 tooltipRect = new Rect (guiWindowRect.xMin - (230-8), mousePos.y - 5, 220, 20);
             }
@@ -289,7 +303,7 @@ namespace ModularFuelSystem.Tanks
 
 				if (trimmed == "") {
 					tank.maxAmount = 0;
-					//"Removing tank as empty input " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
+					//log.warn("Removing tank as empty input " + tank.name + " amount: " + tank.maxAmountExpression ?? "null");
 				} else {
 					double tmp;
 					if (double.TryParse (trimmed, out tmp)) {
@@ -359,7 +373,7 @@ namespace ModularFuelSystem.Tanks
 		void TankLine (FuelTank tank)
 		{
 			GUILayout.BeginHorizontal ();
-			GUILayout.Label (" " + tank, GUILayout.Width (115));
+            GUILayout.Label (" " + tank, GUILayout.Width (137));
 
 			// So our states here are:
 			//   Not being edited currently (empty):   maxAmountExpression = null, maxAmount = 0

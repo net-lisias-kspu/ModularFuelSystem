@@ -36,8 +36,7 @@ namespace ModularFuelSystem
 
             if (_instance != null)
             {
-                Object.Destroy(this);
-                return;
+                Object.Destroy(_instance);
             }
             _instance = this;
 
@@ -45,8 +44,21 @@ namespace ModularFuelSystem
                 FillUpgrades();
 
             EntryCostDatabase.Initialize(); // should not be needed though.
+        }
 
-            GameEvents.OnPartPurchased.Add(new EventData<AvailablePart>.OnEvent(onPartPurchased));
+        public void Destroy()
+        {
+            if (_instance == this)
+                _instance = null;
+        }
+
+        protected IEnumerator UpdateEntryCosts_Coroutine()
+        {
+            yield return null;
+            yield return null;
+
+            EntryCostDatabase.UpdatePartEntryCosts();
+            EntryCostDatabase.UpdateUpgradeEntryCosts();
         }
 
         public override void OnLoad(ConfigNode node)
@@ -55,26 +67,23 @@ namespace ModularFuelSystem
 
             EntryCostDatabase.Load(node.GetNode("Unlocks"));
 
-            EntryCostDatabase.UpdatePartEntryCosts();
-
+            string tlName = string.Empty;
             if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
             {
                 foreach (ConfigNode n in node.GetNodes("TLUpgrade"))
                 {
-                    TLUpgrade tU = null;
-                    if (n.HasValue("name"))
+                    if (n.TryGetValue("name", ref tlName))
                     {
-                        string tlName = n.GetValue("name");
-                        if (techLevelUpgrades.TryGetValue(tlName, out tU))
+                        if (techLevelUpgrades.TryGetValue(tlName, out TLUpgrade tU))
                             tU.Load(n);
                         else
-                        {
-                            tU = new TLUpgrade(n);
-                            techLevelUpgrades[tlName] = tU;
-                        }
+                            techLevelUpgrades[tlName] = new TLUpgrade(n);
                     }
                 }
             }
+
+            // Do this in a coroutine so we run after the PartUpgradeManager loads.
+            StartCoroutine(UpdateEntryCosts_Coroutine());
         }
         public override void OnSave(ConfigNode node)
         {
@@ -85,13 +94,9 @@ namespace ModularFuelSystem
                 {
                     tU.Save(node.AddNode("TLUpgrade"));
                 }
-
-                EntryCostDatabase.Save(node.AddNode("Unlocks"));
             }
-        }
-        public void OnDestroy()
-        {
-            GameEvents.OnPartPurchased.Remove(new EventData<AvailablePart>.OnEvent(onPartPurchased));
+
+            EntryCostDatabase.Save(node.AddNode("Unlocks"));
         }
         #endregion
 
@@ -155,21 +160,11 @@ namespace ModularFuelSystem
             }
         }
 
-        protected IEnumerator updatePartEntryCosts()
-        {
-            yield return new WaitForEndOfFrame();
-
-            EntryCostDatabase.UpdatePartEntryCosts();
-        }
-
-        public void onPartPurchased(AvailablePart ap)
+        public void OnPartPurchased(AvailablePart ap)
         {
             EntryCostDatabase.SetUnlocked(ap);
 
-            StartCoroutine(updatePartEntryCosts());
-
-            Part part = ap.partPrefab;
-            if(part != null)
+            if (ap.partPrefab is Part part)
             {
                 for(int i = part.Modules.Count - 1; i >= 0; --i)
                 {
@@ -196,6 +191,15 @@ namespace ModularFuelSystem
                     }
                 }
             }
+
+            EntryCostDatabase.UpdatePartEntryCosts();
+        }
+
+        public void OnPartUpgradePurchased(PartUpgradeHandler.Upgrade up)
+        {
+            EntryCostDatabase.SetUnlocked(up);
+
+            EntryCostDatabase.UpdateUpgradeEntryCosts();
         }
         
         public bool ConfigUnlocked(string cfgName)
@@ -207,6 +211,18 @@ namespace ModularFuelSystem
         {
             EntryCostDatabase.ClearTracker();
             return EntryCostDatabase.GetCost(cfgName);
+        }
+
+        public double ConfigEntryCost(IEnumerable<string> cfgNames)
+        {
+            EntryCostDatabase.ClearTracker();
+            double sum = 0;
+            foreach (string cfgName in cfgNames)
+            {
+                sum += EntryCostDatabase.GetCost(cfgName);
+            }
+
+            return sum;
         }
 
         public bool PurchaseConfig(string cfgName)

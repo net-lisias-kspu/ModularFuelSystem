@@ -1,19 +1,18 @@
 **** RealFuels ****
 by NathanKell
-Contributors: Chestburster, Starwaster, taniwha, swamp_ig, ialdabaoth (obviously, but back again!), blowfish
+Contributors: Butcher, DRVeyl, Al2Me6, siimav, Standecco, Chestburster, Starwaster, taniwha, swamp_ig, ialdabaoth (obviously, but back again!), blowfish
 ialdabaoth (who is awesome) created Modular Fuels, and this is a fork of the RealFuels branch.
 
 License remains CC-BY-SA as modified by ialdabaoth.
 Source: https://github.com/NathanKell/ModularFuelSystem (shared repository between RF and Modular Fuel Tanks).
 
-Also included (all are required)
+Required mods:
 * Module Manager by sarbian, swamp_ig, and ialdabaoth. See thread for details: http://forum.kerbalspaceprogram.com/threads/55219
 * Community Resource Pack: See thread for details: http://forum.kerbalspaceprogram.com/threads/91998
 * SolverEngines by NathanKell and blowfish. See thread for details: http://forum.kerbalspaceprogram.com/threads/122976
 
 
 Includes ullage simulation code based on that by HoneyFox in EngineIgnitor, reused under MIT License. See end of readme for license details.
-Includes ConfigNodeExtensions by stupid_chris, license CC-BY-SA.
 
 DESCRIPTION:
 Real Fuels does the following:
@@ -49,6 +48,89 @@ AN OVERVIEW OF FUEL TYPES AND TANK TYPES AND TECH LEVELS/ENGINE TYPES AND UPGRAD
 
 ==========
 Changelog:
+
+v13.5.1
+* Fix a crash resulting from loading a part that has multiple configs, uses gimbal management, and does not have a ModuleGimbal.
+* Changed normal distribution to reroll if it falls outside the desired range, instead of clamping it. This avoids a problem where the edge value of the interval was more likely to occur than some values closer to the mean (#272).
+* Changed the weights in varianceIsp to have the correct variance of 1 (#272).
+
+v13.5.0
+* Change from using Unity's Random to using System Random since Unity's version is not producing properly unique results.
+
+v13.4.0
+* Reworked gimbal management system that restores original gimbal parameters correctly and supports managing multiple gimbals (#271).
+
+v13.3.1
+* Tweak variance values for solid propellants.
+
+v13.3.0
+* Fixed thrust axis (for ullage etc) to use KSP 1.2+ support for multiple thrust transforms.
+* Fully hide B9PS switcher in flight.
+* Fix some issues with tooltips.
+* Fix EntryCostModifiers not interacting correctly with PartUpgrades.
+* Use independent throttle, if active, when determining if an engine is throttled up.
+* No longer include dependent mods in the archive - CKAN installs them for you.
+
+v13.2.0
+* Switch to showing effective tank volume, rather than liters at STP, of propellants in the autofill buttons. Solves the "autofill with 99% pressurant" UI bug.
+* Improve the value passed to MJ/KER regarding predicted residuals.
+
+v13.1.0
+* Fix B9PS autoswitching when the part in question has resources (#268)
+* Ignore residuals requirements with ignoreForIsp propellants.
+* Fix bug with the implementation of MLI upgrades that led to the total MLI layers being broken on craft load in career.
+* Support showing rated continuous burn time as well as rated burn time in the module info text.
+
+v13.0.0
+* Added ability to gate Tanks behind PartUpgrades. set partUpgradeRequired just like techRequired.
+* Add B9PS integration to apply a switch when changing engine config.
+* Add Animated Bimodal engine support so engines can have nozzles extending in flight, etc.
+* Add support for enhanced variance in engine performance. Engines now vary from engine to engine, run to run (i.e. per ignition), and during a run. Engines vary in specific impulse, flow rate, and (if they only have two major propellants) mixture ratio. This defaults to off, and replaces the previous variance system.
+* Add support for residuals. Engines can't burn all propellant in their tanks (or casings, if solid) and leave some behind unburnt. A predicted value for this is displayed on the PAW in the VAB/SPH and in flight, and it is a worst-reasonable-case estimate. NOTE: You must use the latest dev version of MechJeb (or KER, once KER accepts Butcher's PR) or the estimated delta V will be higher than what you actually get out of your stage. This defaults to off. (API integration: get the KSPfield predictedMaximumResiduals which is a multiplier to the total propellant the engine has access to that will be left unburnt.
+* Variation and residuals have reasonable guesses at default values for pump-fed and pressure-fed liquid engines and various types of solid rocket motors.
+* Support applying ECMs to PARTUPGRADEs.
+
+
+v12.9.1
+* Fix for ullage status display on pressure fed engines.
+* Fix for PAW caching for 1.10+ KSP versions.
+* Fix for bulk part purchasing costs.
+
+v12.9.0
+* Drag cubes fixes for procedural parts.
+* Kerbalism integration for boiloff.
+* Grouped GUI controls in editor PAW.
+* Remove empty tank nodes from save files for file size reduction.
+* Multiple part ECM cost improvements.
+* ModuleEngineRealFuels refactoring.
+* Improved PAW displays.
+* Refuelling pump rewrite.
+* ModuleFuelTanksRealFuels refactoring including improved boiloff calculations.
+* Boiloff calcs are now instant instead of deferred to a coroutine.
+* Cryogenic tank lists are now cached for improved performance.
+* Removed version check on startup.
+
+v12.8.5
+* Add PAW grouping for RF debugging. (all four boiloff debug fields will be in a group labeled RF Boiloff
+
+v12.8.4.1
+* Recompile for KSP 1.8
+* Fixed cases where MonoBehaviour derived classes were being called before Awake()
+* Close tank window when tank part is deleted. (Fixes nullref issues when part is deleted with tank window open)
+* Boil-off PAW information visible by default (controlled by config file)
+* Exception handling added for procedural part checks.
+* PARTUPGRADE handling. (both to handle the upgrade and prevent unnecessary and game breaking calls to OnLoad)
+
+v12.8.3.1
+* Compile for KSP 1.7.3
+
+v12.8.3
+* Fixed checkers reporting incorrect versioning
+
+v12.8.2
+* Resolves utilization issue introduced by recent update.
+* Last ditch attempt to patch SSTU parts in conflict with Real Fuels. (tells SSTUModularParts to defer to RF on mass/cost issues and defers to SSTUModularRCS on mass issues)
+
 v12.8.1
 * Address VAB lag by limiting procedural part rerendering to when actual volume changes occur.
 * Further refinement for procedural tank handling.

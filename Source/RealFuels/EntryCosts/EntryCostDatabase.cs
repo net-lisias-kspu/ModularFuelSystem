@@ -7,6 +7,7 @@ namespace ModularFuelSystem
         #region Fields
         protected static Dictionary<string, PartEntryCostHolder> holders = null;
         protected static Dictionary<string, AvailablePart> nameToPart = null;
+        protected static Dictionary<string, PartUpgradeHandler.Upgrade> nameToUpgrade = null;
         protected static HashSet<string> unlocks = null;
 
         protected static HashSet<string> unlockPathTracker = new HashSet<string>();
@@ -21,6 +22,9 @@ namespace ModularFuelSystem
         {
             if (nameToPart == null)
                 FillPartList();
+
+            if (nameToUpgrade == null)
+                FillUpgradeList();
 
             if (holders == null)
                 FillHolders();
@@ -46,11 +50,18 @@ namespace ModularFuelSystem
                     continue;
                 }
                 Part part = ap.partPrefab;
-                if (part != null)
-                {
-                    string name = GetPartName(ap);
-                    nameToPart[name] = ap;
-                }
+                if (ap?.partPrefab is Part)
+                    nameToPart[GetPartName(ap)] = ap;
+            }
+        }
+
+        protected static void FillUpgradeList()
+        {
+            nameToUpgrade = new Dictionary<string, PartUpgradeHandler.Upgrade>();
+
+            foreach (PartUpgradeHandler.Upgrade upgrade in PartUpgradeManager.Handler)
+            {
+                nameToUpgrade[GetPartName(upgrade.name)] = upgrade;
             }
         }
 
@@ -73,9 +84,7 @@ namespace ModularFuelSystem
         // from RF
         protected static string GetPartName(Part part)
         {
-            if (part.partInfo != null)
-                return GetPartName(part.partInfo);
-            return GetPartName(part.name);
+            return part.partInfo != null ? GetPartName(part.partInfo) : GetPartName(part.name);
         }
 
         protected static string GetPartName(AvailablePart ap)
@@ -101,16 +110,18 @@ namespace ModularFuelSystem
             SetUnlocked(GetPartName(ap));
         }
 
+        public static void SetUnlocked(PartUpgradeHandler.Upgrade up)
+        {
+            SetUnlocked(GetPartName(up.name));
+        }
+
         public static void SetUnlocked(string name)
         {
             unlocks.Add(name);
 
-            PartEntryCostHolder h;
-            if (holders.TryGetValue(name, out h))
-            {
+            if (holders.TryGetValue(name, out PartEntryCostHolder h))
                 foreach (string s in h.children)
                     SetUnlocked(s);
-            }
         }
 
         public static int GetCost(string name)
@@ -127,8 +138,7 @@ namespace ModularFuelSystem
 
             unlockPathTracker.Add(name);
 
-            PartEntryCostHolder h;
-            if (holders.TryGetValue(name, out h))
+            if (holders.TryGetValue(name, out PartEntryCostHolder h))
                 return h.GetCost();
 
             return 0;
@@ -136,13 +146,16 @@ namespace ModularFuelSystem
 
         public static void UpdateEntryCost(AvailablePart ap)
         {
-            string name = GetPartName(ap);
-
-            EntryCostDatabase.ClearTracker();
-
-            PartEntryCostHolder h;
-            if (holders.TryGetValue(name, out h))
+            ClearTracker();
+            if (holders.TryGetValue(GetPartName(ap), out PartEntryCostHolder h))
                 ap.SetEntryCost(h.GetCost());
+        }
+
+        public static void UpdateEntryCost(PartUpgradeHandler.Upgrade upgrade)
+        {
+            ClearTracker();
+            if (holders.TryGetValue(GetPartName(upgrade.name), out PartEntryCostHolder h))
+                upgrade.entryCost = h.GetCost();
         }
 
         public static void Save(ConfigNode node)
@@ -179,8 +192,16 @@ namespace ModularFuelSystem
 
                 if (ap == null || ap.partPrefab == null)
                     continue;
+                if (ap?.partPrefab is Part)
+                    UpdateEntryCost(ap);
+            }
+        }
 
-                UpdateEntryCost(ap);
+        public static void UpdateUpgradeEntryCosts()
+        {
+            foreach (PartUpgradeHandler.Upgrade upgrade in PartUpgradeManager.Handler)
+            {
+                UpdateEntryCost(upgrade);
             }
         }
         #endregion
